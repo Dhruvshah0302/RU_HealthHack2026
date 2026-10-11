@@ -30,6 +30,10 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+# The app's own reader. Using it here means the summary and the checks see the
+# data exactly as the running app does.
+from app.ehr import contexts_from_bundle
+
 # ---------------------------------------------------------------------------
 # Settings. Change these, then run the script again.
 # ---------------------------------------------------------------------------
@@ -339,55 +343,6 @@ def build_bundle(people: list[Person] | None = None) -> dict:
         "entry": [{"resource": r, "request": {"method": "PUT", "url": f"{r['resourceType']}/{r['id']}"}}
                   for r in resources],
     }
-
-
-# ---------------------------------------------------------------------------
-# Reading the bundle back. This is the logic app/ehr.py needs: it pulls out only
-# the fields the routing rules use and nothing else.
-# ---------------------------------------------------------------------------
-
-def contexts_from_bundle(bundle: dict) -> dict[str, dict]:
-    """Map each room number to the patient facts the routing rules need."""
-    by_type: dict[str, list[dict]] = {}
-    for entry in bundle["entry"]:
-        resource = entry["resource"]
-        by_type.setdefault(resource["resourceType"], []).append(resource)
-    room_names = {f"Location/{loc['id']}": loc["name"] for loc in by_type.get("Location", [])
-                  if loc["name"].startswith("Room ")}
-    patients = {f"Patient/{p['id']}": p for p in by_type.get("Patient", [])}
-
-    def for_patient(kind: str, ref: str, key: str = "patient") -> list[dict]:
-        return [r for r in by_type.get(kind, []) if r[key]["reference"] == ref]
-
-    out = {}
-    for enc in by_type.get("Encounter", []):
-        if enc["status"] != "in-progress":
-            continue
-        stays = [s for s in enc["location"] if s["location"]["reference"] in room_names]
-        if not stays:
-            continue
-        room = room_names[stays[0]["location"]["reference"]].removeprefix("Room ")
-        ref = enc["subject"]["reference"]
-        patient = patients[ref]
-        diets = [o for o in for_patient("NutritionOrder", ref) if o["status"] == "active"]
-        allergies = [a for a in for_patient("AllergyIntolerance", ref)
-                     if a["clinicalStatus"]["coding"][0]["code"] == "active"]
-        flag_codes = {f["code"]["coding"][0]["code"] for f in for_patient("Flag", ref, "subject")
-                      if f["status"] == "active"}
-        isolation = next((c.removeprefix("isolation-") for c in sorted(flag_codes)
-                          if c.startswith("isolation-")), "none")
-        out[room] = {
-            "room": room,
-            "name": f"{patient['name'][0]['given'][0]} {patient['name'][0]['family']}",
-            "language": patient["communication"][0]["language"]["coding"][0]["code"],
-            # No active diet order means we do not know the diet. Never assume "regular".
-            "diet": diets[0]["oralDiet"]["type"][0]["coding"][0]["code"] if diets else "unknown",
-            "allergies": [a["code"]["text"] for a in allergies if "food" in a.get("category", [])],
-            "fall_risk": "high" if "fall-risk-high" in flag_codes else "standard",
-            "isolation": isolation,
-            "location": "in_room" if stays[0].get("status") == "active" else "off_unit",
-        }
-    return out
 
 
 # ---------------------------------------------------------------------------
