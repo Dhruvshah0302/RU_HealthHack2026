@@ -55,7 +55,26 @@ def test_transcribe_success(client, monkeypatch):
     assert response.json() == {"text": "I need some water", "language": "en"}
     assert seen["url"].endswith("/speech-to-text")
     assert seen["data"]["model_id"] == "scribe_v2"
-    assert seen["data"]["language_code"] == "en"      # en-US reduced to ISO-639-1
+    assert "language_code" not in seen["data"]        # the page default is not forced on the speech
+
+
+def test_transcribe_passes_on_a_language_the_page_was_opened_in(client, monkeypatch):
+    """?lang=hi-IN is a deliberate choice, so it is sent as a hint; plain English is not."""
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    seen = {}
+
+    def handler(url, **kwargs):
+        seen["data"] = kwargs.get("data")
+        return _FakeResponse(200, {"text": "\u092e\u0941\u091d\u0947 \u0924\u094c\u0932\u093f\u092f\u093e \u091a\u093e\u0939\u093f\u090f", "language_code": "hi"})
+
+    _patch_post(monkeypatch, handler)
+    response = client.post(
+        "/api/transcribe",
+        files={"file": ("clip.webm", b"RIFFfakeaudio", "audio/webm")},
+        data={"lang": "hi-IN"},
+    )
+    assert response.status_code == 200 and response.json()["language"] == "hi"
+    assert seen["data"]["language_code"] == "hi"
 
 
 def test_transcribe_missing_key_returns_503(client, monkeypatch):

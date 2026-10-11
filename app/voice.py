@@ -80,7 +80,11 @@ async def transcribe(file: UploadFile, lang: str | None = Form(default=None)):
 
     data = {"model_id": STT_MODEL_ID}
     code = _lang_code(lang)
-    if code:
+    # English is what the page opens in for every patient, so it says nothing about what this
+    # patient speaks. Passing it on would force Hindi or Spanish speech into English words.
+    # Only a language the page was deliberately opened in (?lang=hi-IN) is passed as a hint;
+    # otherwise ElevenLabs detects the language from the speech itself.
+    if code and code != "en":
         data["language_code"] = code
     files = {"file": (file.filename or "audio", audio, file.content_type or "application/octet-stream")}
 
