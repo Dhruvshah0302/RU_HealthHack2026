@@ -14,12 +14,14 @@ from pydantic import BaseModel, Field
 from .baseline import BaselineClassifier
 from .router import route
 from .store import TicketStore
+from .voice import router as voice_router
 
 load_dotenv()
 logger = logging.getLogger("callbell")
 STATIC = Path(__file__).parent / "static"
 
 app = FastAPI(title="Call Bell Router")
+app.include_router(voice_router)      # ElevenLabs proxy: /api/transcribe, /api/speak
 store = TicketStore()
 dashboards: set[WebSocket] = set()
 
