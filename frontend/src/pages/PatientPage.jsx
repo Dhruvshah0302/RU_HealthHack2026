@@ -8,6 +8,7 @@ import { useVoiceCapture } from "../hooks/useVoiceCapture.js";
 import { submitRequest } from "../lib/api.js";
 import { T } from "../lib/i18n.js";
 import { room, langTag, lang, initialMode, DEBUG } from "../lib/params.js";
+import "../styles/patient.css";
 
 /* Bedside page. Rules it keeps:
    - room and language come from the address (?room=412&lang=es)

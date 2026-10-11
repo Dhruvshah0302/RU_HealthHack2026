@@ -38,6 +38,7 @@ src/
   lib/i18n.js              English and Spanish text
   lib/params.js            room, language and mode from the address
   styles/patient.css
+  mock/mockApi.js          placeholder backend (development only)
 ```
 
 ## Rules the page keeps

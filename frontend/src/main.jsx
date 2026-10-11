@@ -1,7 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
-import "./styles/patient.css";
 
 async function start() {
   // The placeholder backend only exists in development builds; it is never shipped.
