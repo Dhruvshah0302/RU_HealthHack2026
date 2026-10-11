@@ -33,16 +33,19 @@ export async function submitRequest({ room, text = "", direct_nurse = false }) {
   }
 }
 
-// Returns the transcript, or "" if ElevenLabs is unavailable, failed or heard nothing.
+// Asks ElevenLabs (through our server) for the words. Returns { text, error }:
+// text is "" when nothing was heard; error says why ElevenLabs could not answer.
+const VOICE_ERRORS = { 503: "not set up on the server", 502: "returned an error", 504: "took too long", 413: "recording too long", 415: "audio format not accepted" };
+
 export async function transcribe(blob, langTag) {
   try {
     const form = new FormData();
     form.append("file", blob, "request.webm");
     form.append("lang", langTag);
     const response = await fetchWithin("/api/transcribe", { method: "POST", body: form }, TRANSCRIBE_WAIT_MS);
-    if (!response.ok) return "";
-    return ((await response.json()).text || "").trim();
-  } catch {
-    return "";
+    if (!response.ok) return { text: "", error: VOICE_ERRORS[response.status] || `error ${response.status}` };
+    return { text: ((await response.json()).text || "").trim(), error: null };
+  } catch (err) {
+    return { text: "", error: err.name === "AbortError" ? "took too long" : "could not be reached" };
   }
 }

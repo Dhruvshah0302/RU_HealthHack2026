@@ -8,6 +8,7 @@ function waited(min) {
 }
 
 const MAX_NOTES = 2;
+const SORTED_BY = { llm: "Sorted by AI (Bedrock)", baseline: "Sorted by keyword fallback", none: "Nurse button" };
 
 /* Every ticket has the same size and the same layout, whatever the team:
    room | priority | waiting time, then the request, then the action at the bottom.
@@ -16,7 +17,7 @@ export default function TicketCard({ ticket, team, level, now, onStatus }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const overdue = isOverdue(ticket, level, now);
-  const next = ticket.status === "open" ? ["acknowledged", "On it"] : ["done", "Done"];
+  const next = ["done", "Close ticket"];                 // one step: closing a ticket marks it done
   const away = ticket.status === "waiting_for_patient";
   const notes = ticket.notes || [];
   const said = ticket.original_text && ticket.original_text !== ticket.summary ? ticket.original_text : "";
@@ -56,9 +57,12 @@ export default function TicketCard({ ticket, team, level, now, onStatus }) {
       </div>
 
       <div className="ticket-actions">
+        {ticket.classified_by && !error && ticket.status !== "acknowledged" && (
+          <span className="sorted-by">{SORTED_BY[ticket.classified_by] || ticket.classified_by}</span>
+        )}
         {error ? <span className="ticket-error clamp-1" role="alert">{error}</span>
                : ticket.status === "acknowledged" && <span className="state">On it</span>}
-        <button type="button" className={`act ${next[0]}`} onClick={press} disabled={busy}>{next[1]}</button>
+        <button type="button" className="act" onClick={press} disabled={busy}>{next[1]}</button>
       </div>
     </article>
   );

@@ -3,8 +3,9 @@ import { transcribe } from "../lib/api.js";
 
 /* One tap starts listening. We record audio for ElevenLabs and, at the same time, run
    Chrome's own speech recognition, so if ElevenLabs fails we already have a transcript
-   without asking the patient to repeat. onResult gets the words, or "" when nothing was
-   understood (no microphone, silence, both services failed): the page sends "" to the nurse. */
+   without asking the patient to repeat. onResult gets { text, source, elevenError }:
+   source is "elevenlabs", "browser" or null (nothing understood), and elevenError says why
+   ElevenLabs gave no words, if it did not. The page decides what to do with it. */
 
 // SPEC: stop after 2 s of silence or 10 s in total.
 const SILENCE_MS = 2000;
@@ -50,12 +51,19 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
     sessionRef.current = null;
 
     let text = "";
+    let source = null;
+    let elevenError = "no audio was recorded";
     if (s.chunks.length) {
       const blob = new Blob(s.chunks, { type: s.recorder.mimeType || "audio/webm" });
-      if (blob.size) text = await transcribe(blob, langTag);
+      if (blob.size) {
+        const result = await transcribe(blob, langTag);
+        text = result.text;
+        elevenError = result.error || (text ? null : "heard no words");
+        if (text) source = "elevenlabs";
+      }
     }
-    if (!text) text = s.browserText.trim();
-    try { await onResultRef.current(text); } finally { setState("idle"); }
+    if (!text && s.browserText.trim()) { text = s.browserText.trim(); source = "browser"; }
+    try { await onResultRef.current({ text, source, elevenError }); } finally { setState("idle"); }
   }, [langTag]);
 
   const finishRef = useRef(finish);
@@ -84,7 +92,7 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
       stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
     } catch {
       if (audio) audio.close().catch(() => {});
-      await onResultRef.current("");                 // no microphone: the nurse gets the press
+      await onResultRef.current({ text: "", source: null, elevenError: null, noMic: true });
       return;
     }
 
@@ -123,7 +131,7 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
 
     if (!s.recorder && !s.recognition) {
       stopCapture(s); sessionRef.current = null;
-      await onResultRef.current("");
+      await onResultRef.current({ text: "", source: null, elevenError: null, noMic: true });
       return;
     }
 

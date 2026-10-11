@@ -10,12 +10,12 @@
    NOT the real routing: a few keywords so the screens can be clicked through. The real
    decision comes from app/router.py, app/rules.py and the model. */
 
-const STORE = "callbell-mock-v2";
+const STORE = "callbell-mock-v3";
 const channel = "BroadcastChannel" in window ? new BroadcastChannel("callbell-mock") : null;
 const listeners = new Set();
 
 const NAMES = {
-  nurse: "Clinical", unit_clerk: "Unit Clerk", environmental_services: "Environmental Services",
+  nurse: "Clinical", unit_clerk: "Unit Clerk", environmental_services: "Housekeeping",
   food_services: "Food & Nutrition", facilities_biomed: "Facilities & Biomed",
   patient_advocacy: "Patient Advocacy", case_management: "Case Management",
 };
@@ -61,14 +61,14 @@ function save(data) {
   try { localStorage.setItem(STORE, JSON.stringify(data)); } catch { /* memory only */ }
 }
 function stats(data) {
-  // by_department: every ticket each department has received, open or done.
-  const by_department = {};
+  // by_team: every ticket each team has received, open or done.
+  const by_team = {};
   for (const t of data.tickets) {
-    const d = (by_department[t.department] ||= { total: 0, done: 0 });
+    const d = (by_team[t.team || t.department] ||= { total: 0, done: 0 });
     d.total += 1;
     if (t.status === "done") d.done += 1;
   }
-  return { requests_total: data.requests_total, requests_without_nurse: data.requests_without_nurse, by_department };
+  return { requests_total: data.requests_total, requests_without_nurse: data.requests_without_nurse, by_team };
 }
 function emit(event) {
   listeners.forEach((fn) => fn(event));          // this tab
@@ -83,6 +83,7 @@ function makeTicket(data, room, text, department, level, extra = {}) {
     summary: extra.summary || text || "Patient pressed the call button. Nothing was understood.",
     original_text: text, created_at: extra.created_at || now(), status: extra.status || "open",
     reasons: extra.reasons || [], notes: extra.notes || [], patient_name: null,
+    team: department, team_name: NAMES[department],
   };
 }
 

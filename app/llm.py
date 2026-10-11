@@ -10,18 +10,27 @@ import os
 
 from .models import ROUTINE, URGENT, Classification, Intent
 
-CATEGORIES = ["cleaning_environment", "dietary", "tech_amenities", "clinical", "unknown"]
+CATEGORIES = ["cleaning_environment", "facilities_equipment", "dietary", "tech_amenities",
+              "patient_relations", "care_coordination", "clinical", "unknown"]
 
 SYSTEM_PROMPT = """You sort hospital inpatients' call-bell requests so that non-clinical ones \
-reach the right support team and clinical ones reach the nurse.
+reach the right support team and clinical ones reach the nurse. Each category is one team.
 
 Categories:
-- cleaning_environment: room cleaning, spills, linens, pillows, blankets, room temperature, \
-lights, plumbing, noise from equipment in the room, broken furniture.
+- cleaning_environment (Housekeeping): room cleaning, spills, trash, linens, \
+pillows, blankets, towels, toiletries.
+- facilities_equipment (Facilities & Biomedical): room temperature, lights, plumbing, a toilet \
+or sink that does not work, doors and blinds, noise from equipment, a TV, tablet, phone or \
+hospital bed that is broken or not working, broken furniture.
 - dietary: food, drinks, meal trays, menus, utensils, and questions about ordering food, \
 including meals for visitors.
-- tech_amenities: TV, remote, Wi-Fi, phone, chargers, tablet, visiting hours, parking, \
-chaplain or interpreter requests, general information.
+- tech_amenities (Unit Clerk): Wi-Fi, how to use the TV, remote, phone or tablet, changing \
+channels, chargers, visiting hours, parking, chaplain requests, general information.
+- patient_relations (Patient Advocacy): a complaint about care or staff, asking for an interpreter or translator, \
+questions about the patient's rights, wanting to speak to a manager or patient advocate.
+- care_coordination (Case Management and Social Work): insurance or coverage questions, arranging a nursing home, rehab or \
+skilled nursing facility after discharge, home health services, equipment needed at home \
+(walker, wheelchair, hospital bed), help from a social worker.
 - clinical: anything about the patient's body, symptoms, pain, breathing, bleeding, wounds, \
 dressings, medication, IV lines or medical devices, tests, procedures, mobility or toileting \
 help, sleep, mood, safety, a slip, trip or near-fall even if the patient was not hurt, \
@@ -123,14 +132,30 @@ class BedrockClassifier:
         self.input_tokens = 0
         self.output_tokens = 0
 
-    def classify(self, text: str) -> Classification:
-        response = self.client.converse(
+    # How the model is made to answer through the tool. Claude accepts "use this tool";
+    # some other Bedrock models only accept "use a tool" ("any"), which is the same here
+    # because there is only one tool. The first refusal switches to "any" for good.
+    _TOOL_CHOICES = ({"tool": {"name": "route_request"}}, {"any": {}})
+
+    def _converse(self, text: str, choice: dict):
+        return self.client.converse(
             modelId=self.model_id,
             system=[{"text": SYSTEM_PROMPT}],
             messages=[{"role": "user", "content": [{"text": f"Patient request:\n{text}"}]}],
-            toolConfig={"tools": [TOOL], "toolChoice": {"tool": {"name": "route_request"}}},
+            toolConfig={"tools": [TOOL], "toolChoice": choice},
             inferenceConfig=self.inference_config,
         )
+
+    def classify(self, text: str) -> Classification:
+        choice = getattr(self, "_choice", self._TOOL_CHOICES[0])
+        try:
+            response = self._converse(text, choice)
+        except Exception as exc:
+            code = getattr(exc, "response", {}).get("Error", {}).get("Code", "")
+            if choice is self._TOOL_CHOICES[1] or code != "ValidationException":
+                raise                                   # the router sends the request to the nurse
+            self._choice = self._TOOL_CHOICES[1]
+            response = self._converse(text, self._choice)
         usage = response.get("usage") or {}
         self.calls += 1
         self.input_tokens += int(usage.get("inputTokens", 0))

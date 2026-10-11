@@ -23,11 +23,11 @@ export default function DashboardPage() {
   const [now, setNow] = useState(Date.now());
 
   // Every ticket this screen has seen (open or done), by id. Used for a team's total when the
-  // backend does not send stats.by_department yet.
+  // backend does not send stats.by_team.
   const [seen, setSeen] = useState(new Map());
   const remember = useCallback((list) => setSeen((m) => {
     const next = new Map(m);
-    list.forEach((t) => next.set(t.id, t.department));
+    list.forEach((t) => next.set(t.id, t.team || t.department));
     return next;
   }), []);
 
@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
   // Each ticket with its team and level, ordered by level then longest wait.
   const rows = useMemo(() => [...tickets.values()]
-    .map((t) => { const tm = teamFor(t.department); return { ticket: t, team: tm, level: levelOf(t, tm) }; })
+    .map((t) => { const tm = teamFor(t.team || t.department); return { ticket: t, team: tm, level: levelOf(t, tm) }; })
     .sort((a, b) => a.level - b.level || a.ticket.created_at - b.ticket.created_at), [tickets]);
 
   const counts = useMemo(() => {
@@ -93,7 +93,7 @@ export default function DashboardPage() {
   }, [rows]);
 
   const shown = rows.filter((r) => r.team.key === team);
-  const byDept = stats?.by_department;
+  const byDept = stats?.by_team || stats?.by_department;
   const received = byDept
     ? current.codes.reduce((sum, code) => sum + (byDept[code]?.total || 0), 0)
     : [...seen.values()].filter((code) => teamFor(code).key === team).length;

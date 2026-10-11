@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import ModeSwitch from "../components/ModeSwitch.jsx";
 import VoicePanel from "../components/VoicePanel.jsx";
+import HeardCard from "../components/HeardCard.jsx";
 import TypePanel from "../components/TypePanel.jsx";
 import Confirmation from "../components/Confirmation.jsx";
 import NurseBar from "../components/NurseBar.jsx";
@@ -22,6 +23,8 @@ export default function PatientPage() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState(null);
+  const [heard, setHeard] = useState(null);         // what the voice capture understood, shown while it is sent
+  const [said, setSaid] = useState("");             // the words, kept on the confirmation
   const textRef = useRef(null);
 
   useEffect(() => {
@@ -49,14 +52,24 @@ export default function PatientPage() {
     }
   }, [t]);
 
-  // Nothing understood ("") goes to the nurse, as a call bell does today.
-  const voice = useVoiceCapture({
-    langTag, debug: DEBUG,
-    onResult: (heard) => submit(heard ? { text: heard } : { direct_nurse: true }),
-  });
+  // The words (from ElevenLabs) go on screen and to the backend at the same moment; the
+  // backend's model sorts them into a team. Nothing understood still reaches the nurse if the
+  // patient does not try again.
+  const voice = useVoiceCapture({ langTag, debug: DEBUG, onResult: (result) => setHeard(result) });
+
+  async function sendHeard(request) {
+    setSaid(request.text || "");
+    await submit(request);
+    setHeard(null);
+  }
+
+  function sayAgain() {
+    setHeard(null);
+    voice.start();
+  }
 
   function changeMode(next) {
-    if (next !== "voice") voice.cancel();
+    if (next !== "voice") { voice.cancel(); setHeard(null); }
     setProblem(null);
     setMode(next);
     if (next === "type") setTimeout(() => textRef.current?.focus(), 0);
@@ -64,6 +77,8 @@ export default function PatientPage() {
 
   function callNurse() {
     voice.cancel();
+    setHeard(null);
+    setSaid("");
     submit({ text: mode === "type" ? text : "", direct_nurse: true });
   }
 
@@ -81,12 +96,15 @@ export default function PatientPage() {
           <section className="ask">
             <h1>{t.title}</h1>
             {mode === "voice"
-              ? <VoicePanel voice={voice} busy={busy} t={t} />
-              : <TypePanel ref={textRef} text={text} onText={setText} onSubmit={submit} busy={busy} t={t} />}
+              ? (heard
+                  ? <HeardCard key={JSON.stringify(heard)} heard={heard} busy={busy} t={t} onSend={sendHeard} onRetry={sayAgain} />
+                  : <VoicePanel voice={voice} busy={busy} t={t} />)
+              : <TypePanel ref={textRef} text={text} onText={setText} busy={busy} t={t}
+                          onSubmit={(request) => { setSaid(""); submit(request); }} />}
             {problem && <p className="problem" role="alert">{problem}</p>}
           </section>
         ) : (
-          <Confirmation tickets={tickets} t={t} onAgain={() => { setView("ask"); setProblem(null); }} />
+          <Confirmation tickets={tickets} said={said} t={t} onAgain={() => { setView("ask"); setProblem(null); setSaid(""); }} />
         )}
       </main>
 

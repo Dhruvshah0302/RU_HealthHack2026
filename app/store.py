@@ -14,12 +14,13 @@ class TicketStore:
         self.requests_total = 0
         self.requests_without_nurse = 0
 
-    def add(self, room: str, original_text: str, planned, patient_name: str | None = None) -> Ticket:
+    def add(self, room: str, original_text: str, planned, patient_name: str | None = None,
+            team: str | None = None, classified_by: str | None = None) -> Ticket:
         ticket = Ticket(
             id=f"T{next(self._ids):04d}", room=room, department=planned.department,
             priority=planned.priority, summary=planned.summary, original_text=original_text,
             created_at=time.time(), status=planned.status, reasons=list(planned.reasons),
-            notes=list(planned.notes), patient_name=patient_name,
+            notes=list(planned.notes), patient_name=patient_name, team=team, classified_by=classified_by,
         )
         self._tickets[ticket.id] = ticket
         return ticket
@@ -39,5 +40,13 @@ class TicketStore:
         return [t for t in self._tickets.values() if t.status != "done"]
 
     def stats(self) -> dict:
+        # by_team: every ticket each team has received, open or done (for the staff dashboard)
+        by_team: dict[str, dict[str, int]] = {}
+        for t in self._tickets.values():
+            counts = by_team.setdefault(t.team or t.department, {"total": 0, "done": 0})
+            counts["total"] += 1
+            if t.status == "done":
+                counts["done"] += 1
         return {"requests_total": self.requests_total,
-                "requests_without_nurse": self.requests_without_nurse}
+                "requests_without_nurse": self.requests_without_nurse,
+                "by_team": by_team}

@@ -4,9 +4,8 @@
    physician, respiratory therapy, pharmacy or PT/OT as needed). Everything else goes to the
    support team that does that work.
 
-   `codes` lists the department codes the backend may send for each team. The backend today
-   sends four (nurse, housekeeping_facilities, food_services, unit_clerk_it); the new teams use
-   the codes proposed in frontend/DEPARTMENTS.md.
+   `codes` lists the codes that mean this team. Tickets carry `team` (app/teams.py); older
+   tickets with only `department` still land on the right screen through these aliases.
 
    Colours identify the team and are far apart on the colour wheel. Red is kept for urgency
    (Emergency, Urgent), so no team uses it. */
@@ -22,7 +21,7 @@ export const DEPARTMENTS = [
     covers: "Desk triage, phone, visitors, Wi-Fi and TV account help",
   },
   {
-    key: "environmental_services", name: "Environmental Services", short: "EVS", group: "support", color: "#198038",
+    key: "environmental_services", name: "Housekeeping", short: "Housekeeping", group: "support", color: "#198038",
     codes: ["environmental_services", "housekeeping_facilities", "housekeeping"],
     covers: "Cleaning, spills, trash, fresh linens",
   },

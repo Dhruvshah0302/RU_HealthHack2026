@@ -27,6 +27,7 @@ class PlannedTicket:
     priority: str
     summary: str
     reasons: list[str] = field(default_factory=list)
+    team: str | None = None                          # from the classifier's category; None means the department's own team
     notes: list[str] = field(default_factory=list)   # patient facts this team needs (app/policy.py)
     status: str = "open"                             # "waiting_for_patient" when the patient is off the unit
 
@@ -76,13 +77,16 @@ def route(text: str, classifier, direct_nurse: bool = False) -> Decision:
     else:
         intents = result.intents
 
+    # One ticket per team, so a cleaning need and a broken bed go to the two teams that do them.
+    # The nurse's team key is NURSE, so the red-flag step below finds the nurse ticket as before.
     by_department: dict[str, PlannedTicket] = {}
     for intent in intents:
         summary = intent.summary or text[:120]
-        existing = by_department.get(intent.department)
+        existing = by_department.get(intent.team)
         if existing is None:
             reason = fail_safe or f"{getattr(classifier, 'source', 'classifier')}: {intent.category}"
-            by_department[intent.department] = PlannedTicket(intent.department, intent.priority, summary, [reason])
+            by_department[intent.team] = PlannedTicket(intent.department, intent.priority, summary, [reason],
+                                                       team=intent.team)
         else:
             if summary not in existing.summary:
                 existing.summary = f"{existing.summary}; {summary}"

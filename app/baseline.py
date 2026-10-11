@@ -21,8 +21,11 @@ _KEYWORDS = {
     ],
     "cleaning_environment": [
         "pillow", "blanket", "sheet", "sheets", "towel", "soap", "trash", "spill", "spilled", "clean",
-        "cleaned", "floor", "toilet", "flush", "cold", "hot", "heat", "light", "blind", "smell",
-        "smells", "leak", "leaking", "sink", "noise", "air conditioner", "laundry", "toilet paper",
+        "cleaned", "floor", "smell", "smells", "laundry", "toilet paper",
+    ],
+    "facilities_equipment": [
+        "toilet", "flush", "cold", "hot", "heat", "light", "blind", "leak", "leaking", "sink",
+        "noise", "air conditioner", "door", "bed won't", "bed doesn't",
     ],
     "dietary": [
         "water", "juice", "coffee", "tea", "food", "hungry", "lunch", "dinner", "breakfast", "meal",
@@ -33,6 +36,15 @@ _KEYWORDS = {
         "tv", "television", "remote", "wifi", "wi-fi", "internet", "phone", "charger", "channel",
         "tablet", "password", "video call", "visiting hours", "visit", "parking", "subtitles",
         "sound", "chaplain",
+    ],
+    "patient_relations": [
+        "complaint", "complain", "interpreter", "translator", "my rights", "patient advocate",
+        "speak to a manager", "talk to a manager", "rude", "grievance",
+    ],
+    "care_coordination": [
+        "insurance", "coverage", "medicare", "medicaid", "social worker", "nursing home",
+        "rehab facility", "skilled nursing", "home health", "walker", "wheelchair at home",
+        "equipment at home", "hospital bed at home",
     ],
 }
 

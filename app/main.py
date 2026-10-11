@@ -8,19 +8,24 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import ehr, policy
+from .teams import team_for
 from .baseline import BaselineClassifier
 from .router import route
 from .store import TicketStore
+from .voice import router as voice_router, voice_status
 
 load_dotenv()
 logger = logging.getLogger("callbell")
-STATIC = Path(__file__).parent / "static"
+# The React app (frontend/), built with `npm run build`. Set FRONTEND_DIST to serve another build.
+FRONTEND_DIST = Path(os.getenv("FRONTEND_DIST") or Path(__file__).resolve().parent.parent / "frontend" / "dist")
 
 app = FastAPI(title="Call Bell Router")
+app.include_router(voice_router)      # ElevenLabs proxy: /api/transcribe, /api/speak
 store = TicketStore()
 dashboards: set[WebSocket] = set()
 
@@ -55,24 +60,47 @@ async def broadcast(event: dict) -> None:
             dashboards.discard(socket)
 
 
+_NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>Frontend not built</title>
+<body style="font-family:system-ui;max-width:40rem;margin:3rem auto;line-height:1.5">
+<h1>The frontend has not been built yet</h1>
+<p>Run this once, then reload:</p>
+<pre style="background:#f3f5f7;padding:1rem;border-radius:8px">cd frontend
+npm install
+npm run build</pre>
+<p>Or, while working on the pages, run <code>npm run dev</code> in <code>frontend/</code> and open
+<a href="http://localhost:5173/?mock=0">http://localhost:5173/?mock=0</a> instead.</p></body>"""
+
+
+def _page():
+    """Both pages are one React app; it picks the page from the address."""
+    index = FRONTEND_DIST / "index.html"
+    if not index.is_file():
+        return HTMLResponse(_NOT_BUILT, status_code=503)
+    return FileResponse(index)
+
+
 @app.get("/")
 def home():
-    return RedirectResponse("/patient")
+    return _page()
 
 
 @app.get("/patient")
 def patient_page():
-    return FileResponse(STATIC / "patient.html")
+    return _page()
 
 
 @app.get("/dashboard")
 def dashboard_page():
-    return FileResponse(STATIC / "dashboard.html")
+    return _page()
+
+
+if (FRONTEND_DIST / "assets").is_dir():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
 
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "classifier": classifier.source}
+    return {"ok": True, "classifier": classifier.source, "voice": voice_status()}
 
 
 @app.post("/api/requests")
@@ -84,7 +112,9 @@ async def create_request(body: PatientRequest):
     context = ehr.get_context(body.room)
     outcome = policy.apply(decision.tickets, context)
     name = context.name if context else None
-    tickets = [store.add(body.room, body.text, planned, patient_name=name) for planned in outcome.tickets]
+    tickets = [store.add(body.room, body.text, planned, patient_name=name, team=team_for(planned),
+                         classified_by=decision.classifier_source)
+               for planned in outcome.tickets]
     store.record_request([t.department for t in tickets])
     for ticket in tickets:
         await broadcast({"type": "ticket_created", "ticket": ticket.to_dict(), "stats": store.stats()})
