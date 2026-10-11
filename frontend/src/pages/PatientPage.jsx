@@ -3,7 +3,7 @@ import ModeSwitch from "../components/ModeSwitch.jsx";
 import VoicePanel from "../components/VoicePanel.jsx";
 import TypePanel from "../components/TypePanel.jsx";
 import Confirmation from "../components/Confirmation.jsx";
-import NurseBar from "../components/NurseBar.jsx";
+import Pennant from "../components/Pennant.jsx";
 import { useVoiceCapture } from "../hooks/useVoiceCapture.js";
 import { submitRequest } from "../lib/api.js";
 import { T } from "../lib/i18n.js";
@@ -21,6 +21,7 @@ export default function PatientPage() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState(null);
+  const [said, setSaid] = useState(null);             // what the patient said, for the confirmation
   const textRef = useRef(null);
 
   useEffect(() => {
@@ -51,7 +52,10 @@ export default function PatientPage() {
   // Nothing understood ("") goes to the nurse, as a call bell does today.
   const voice = useVoiceCapture({
     langTag, debug: DEBUG,
-    onResult: (heard) => submit(heard ? { text: heard } : { direct_nurse: true }),
+    onResult: (heard, language) => {
+      setSaid(heard ? { text: heard, language } : null);
+      return submit(heard ? { text: heard } : { direct_nurse: true });
+    },
   });
 
   function changeMode(next) {
@@ -69,27 +73,30 @@ export default function PatientPage() {
   return (
     <>
       {DEBUG && voice.debugText && <pre className="debug">{voice.debugText}</pre>}
-      <header>
-        <div className="room">{t.room} <b>{room}</b></div>
+      <div className="app">
+      <Pennant room={room} lang={lang} t={t} onNurse={callNurse} />
+
+      <div className="content">
+      <div className="topbar">
         {view === "ask" && <ModeSwitch mode={mode} onChange={changeMode} t={t} />}
-        <div />
-      </header>
+      </div>
 
       <main>
         {view === "ask" ? (
           <section className="ask">
             <h1>{t.title}</h1>
             {mode === "voice"
-              ? <VoicePanel voice={voice} busy={busy} t={t} />
+              ? <VoicePanel voice={voice} busy={busy} t={t} onQuick={submit} />
               : <TypePanel ref={textRef} text={text} onText={setText} onSubmit={submit} busy={busy} t={t} />}
             {problem && <p className="problem" role="alert">{problem}</p>}
           </section>
         ) : (
-          <Confirmation tickets={tickets} t={t} onAgain={() => { setView("ask"); setProblem(null); }} />
+          <Confirmation tickets={tickets} t={t} said={mode === "voice" ? said : null}
+                        onAgain={() => { setView("ask"); setProblem(null); setSaid(null); }} />
         )}
       </main>
-
-      <NurseBar onPress={callNurse} t={t} />
+      </div>
+      </div>
     </>
   );
 }

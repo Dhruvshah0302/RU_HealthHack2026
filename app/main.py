@@ -11,7 +11,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from . import ehr, policy
+from . import ehr, policy, voice
 from .baseline import BaselineClassifier
 from .router import route
 from .store import TicketStore
@@ -21,6 +21,7 @@ logger = logging.getLogger("callbell")
 STATIC = Path(__file__).parent / "static"
 
 app = FastAPI(title="Call Bell Router")
+app.include_router(voice.router)        # /api/transcribe: speech to text (app/voice.py)
 store = TicketStore()
 dashboards: set[WebSocket] = set()
 

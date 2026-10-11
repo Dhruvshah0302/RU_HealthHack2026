@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { transcribe } from "../lib/api.js";
+import { serverSpeechReady, transcribe } from "../lib/api.js";
 
 /* One tap starts listening. We record audio for ElevenLabs and, at the same time, run
    Chrome's own speech recognition, so if ElevenLabs fails we already have a transcript
@@ -19,6 +19,7 @@ const QUIET_HINT_MS = 1500;     // this long without speech shows "a little loud
 const within = (promise, ms) => Promise.race([promise, new Promise((r) => setTimeout(r, ms))]);
 
 function stopCapture(s) {
+  s.analyser = null;
   clearInterval(s.meter);
   clearTimeout(s.limit);
   if (s.recorder && s.recorder.state !== "inactive") { try { s.recorder.stop(); } catch { /* already stopped */ } }
@@ -32,7 +33,14 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
   const [level, setLevel] = useState(0);         // 0..1 live loudness
   const [hint, setHint] = useState(null);        // null | "quiet" | "good"
   const [debugText, setDebugText] = useState("");
+  const [heard, setHeard] = useState("");        // live words while listening (browser recognition only)
+  const [serverSpeech, setServerSpeech] = useState(false);   // ElevenLabs set up on the server
+  const serverSpeechRef = useRef(false);
+  useEffect(() => {
+    serverSpeechReady().then((ready) => { serverSpeechRef.current = ready; setServerSpeech(ready); });
+  }, []);
   const sessionRef = useRef(null);
+  const analyserRef = useRef(null);              // live audio for the bubble around the button
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
 
@@ -43,19 +51,23 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
     setState("working"); setLevel(0); setHint(null);
 
     clearInterval(s.meter); clearTimeout(s.limit);
+    analyserRef.current = null;
     if (s.recorder && s.recorder.state !== "inactive") s.recorder.stop();
     if (s.recognition) { try { s.recognition.stop(); } catch { /* ignore */ } }
     await within(Promise.all([s.stopped, s.recognitionEnded].filter(Boolean)), 2000);
     stopCapture(s);
     sessionRef.current = null;
 
-    let text = "";
+    // ElevenLabs first (any language, much better at messy speech); the browser's words only if it fails.
+    let text = "", language = null, source = "none";
     if (s.chunks.length) {
       const blob = new Blob(s.chunks, { type: s.recorder.mimeType || "audio/webm" });
-      if (blob.size) text = await transcribe(blob, langTag);
+      if (blob.size) ({ text, language } = await transcribe(blob, langTag));
+      if (text) source = "elevenlabs";
     }
-    if (!text) text = s.browserText.trim();
-    try { await onResultRef.current(text); } finally { setState("idle"); }
+    if (!text && s.browserText.trim()) { text = s.browserText.trim(); source = "browser"; }
+    if (debug) setDebugText(`heard by ${source}${language ? " (" + language + ")" : ""}: ${text || "(nothing)"}`);
+    try { await onResultRef.current(text, language); } finally { setState("idle"); }
   }, [langTag]);
 
   const finishRef = useRef(finish);
@@ -67,6 +79,7 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
     if (!s || s.finishing) return;
     s.finishing = true;
     if (s.recognition) { try { s.recognition.abort(); } catch { /* ignore */ } s.recognition = null; }
+    analyserRef.current = null;
     stopCapture(s);
     sessionRef.current = null;
     setState("idle"); setLevel(0); setHint(null);
@@ -81,7 +94,9 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
 
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
+      });
     } catch {
       if (audio) audio.close().catch(() => {});
       await onResultRef.current("");                 // no microphone: the nurse gets the press
@@ -97,7 +112,8 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
 
     // Recorder for ElevenLabs.
     try {
-      s.recorder = new MediaRecorder(stream);
+      const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((m) => MediaRecorder.isTypeSupported(m));
+      s.recorder = new MediaRecorder(stream, { ...(type ? { mimeType: type } : {}), audioBitsPerSecond: 128000 });
       s.recorder.ondataavailable = (e) => { if (e.data.size) s.chunks.push(e.data); };
       s.stopped = new Promise((resolve) => { s.recorder.onstop = resolve; });
       s.recorder.start();
@@ -108,11 +124,15 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
     if (Recognition) {
       try {
         const r = new Recognition();
-        r.lang = langTag; r.continuous = true; r.interimResults = false;
+        r.lang = langTag; r.continuous = true; r.interimResults = true;
         r.onresult = (e) => {
+          let interim = "";
           for (let i = e.resultIndex; i < e.results.length; i++) {
             if (e.results[i].isFinal) s.browserText += " " + e.results[i][0].transcript;
+            else interim += " " + e.results[i][0].transcript;
           }
+          // The browser only knows one language, so its live guess is shown only without ElevenLabs.
+          if (!serverSpeechRef.current) setHeard((s.browserText + interim).trim());
         };
         r.onerror = () => {};
         s.recognitionEnded = new Promise((resolve) => { r.onend = resolve; });
@@ -133,7 +153,10 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
       if (s.audio.state === "suspended") s.audio.resume().catch(() => {});
       const analyser = s.audio.createAnalyser();
       analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.6;
       s.audio.createMediaStreamSource(stream).connect(analyser);
+      s.analyser = analyser;
+      analyserRef.current = analyser;
       const buf = new Float32Array(analyser.fftSize);
       let smooth = 0;
       s.meter = setInterval(() => {
@@ -160,6 +183,7 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
     }
 
     s.limit = setTimeout(() => finishRef.current(), MAX_LISTEN_MS);
+    setHeard("");
     setHint(null);
     setState("listening");
   }, [langTag, debug]);
@@ -167,5 +191,5 @@ export function useVoiceCapture({ langTag, onResult, debug = false }) {
   // Leaving the page never leaves the microphone on.
   useEffect(() => () => { if (sessionRef.current) stopCapture(sessionRef.current); }, []);
 
-  return { state, level, hint, debugText, start, finish, cancel };
+  return { state, level, hint, heard, serverSpeech, debugText, start, finish, cancel, analyser: analyserRef };
 }
