@@ -1,6 +1,11 @@
 # Frontend (React + Vite)
 
-The bedside patient page. Plain React, no UI library.
+Two pages in one app. Plain React, no UI library.
+
+| Address | Page |
+|---|---|
+| `/?room=412` | Bedside patient page |
+| `/dashboard` | Staff dashboard: one screen per team in the team's colour, `?team=food_services` opens that team |
 
 ## Run it
 
@@ -13,7 +18,7 @@ npm run dev
 ```
 
 Open http://localhost:5173/?room=412 in Chrome (`&lang=es` for Spanish, `&mode=type` to open on typing,
-`&debug=1` to see the live microphone reading).
+`&debug=1` to see the live microphone reading), and http://localhost:5173/dashboard in another tab.
 
 ## Placeholder backend
 
@@ -23,6 +28,9 @@ Until the FastAPI server exists, `src/mock/mockApi.js` answers `/api/*` in the b
 It is never included in `npm run build`.
 
 The mock sorts by a few keywords only. It is not the routing policy; that lives in `app/router.py`.
+It routes to all seven teams in `DEPARTMENTS.md`, starts with a few example tickets, and shares
+tickets between tabs, so a request sent from the patient page shows up on the dashboard at once.
+To clear them, run `__callbellMockFeed.reset()` in the browser console and reload.
 
 When the server runs on port 8000, turn the mock off: the dev server forwards `/api` to it.
 
@@ -32,6 +40,10 @@ When the server runs on port 8000, turn the mock off: the dev server forwards `/
 src/
   main.jsx                 starts the app (and the mock in development)
   pages/PatientPage.jsx    the page: state, submit, nurse fallback
+  dashboard/DashboardPage.jsx  staff screen: team switch, queue, live updates
+  dashboard/departments.js the seven teams and the backend codes each accepts
+  dashboard/levels.js      priority levels and time targets (from SPEC.md)
+  dashboard/feed.js        /api/tickets, ticket status, and the /ws live feed
   components/              ModeSwitch, VoicePanel, MicButton, TypePanel, Confirmation, NurseBar
   hooks/useVoiceCapture.js microphone, loudness meter, ElevenLabs + browser speech fallback
   lib/api.js               the only code that calls the server

@@ -12,7 +12,11 @@ export const T = {
     doneTitle: "We got it.", has: "has your request.",
     empty: "Type what you need, or tap one of the choices below.",
     failed: "That did not go through. Please use the call button on your bed.",
-    dept: { nurse: "Nursing", housekeeping_facilities: "Housekeeping", food_services: "Food Services", unit_clerk_it: "The unit clerk" },
+    dept: {
+      nurse: "Your care team", housekeeping_facilities: "Housekeeping", environmental_services: "Housekeeping",
+      food_services: "Food Services", unit_clerk_it: "The unit clerk", unit_clerk: "The unit clerk",
+      facilities_biomed: "Facilities", patient_advocacy: "Patient Relations", case_management: "Case Management",
+    },
     quick: [
       ["food_services", "Water", "I would like some water."],
       ["housekeeping_facilities", "Blanket", "I need another blanket."],
@@ -34,7 +38,11 @@ export const T = {
     doneTitle: "Recibido.", has: "tiene su pedido.",
     empty: "Escriba lo que necesita o toque una de las opciones.",
     failed: "No se pudo enviar. Por favor use el botón de llamada de su cama.",
-    dept: { nurse: "Enfermería", housekeeping_facilities: "Limpieza", food_services: "Servicio de comidas", unit_clerk_it: "La recepción de la unidad" },
+    dept: {
+      nurse: "Su equipo de atención", housekeeping_facilities: "Limpieza", environmental_services: "Limpieza",
+      food_services: "Servicio de comidas", unit_clerk_it: "La recepción de la unidad", unit_clerk: "La recepción de la unidad",
+      facilities_biomed: "Mantenimiento", patient_advocacy: "Relaciones con el paciente", case_management: "Gestión de casos",
+    },
     quick: [
       ["food_services", "Agua", "Quisiera un poco de agua."],
       ["housekeeping_facilities", "Cobija", "Necesito otra cobija."],

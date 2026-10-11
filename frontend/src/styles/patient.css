@@ -7,9 +7,14 @@
   --line: #C9D6DC;
   --nurse: #C8102E;
   --voice: #D7192F;
-  --housekeeping_facilities: #1B7F5C;
-  --food_services: #A65F00;
-  --unit_clerk_it: #3A55A8;
+  --housekeeping_facilities: #198038;
+  --food_services: #E07B00;
+  --unit_clerk_it: #4D5B6A;
+  --unit_clerk: #4D5B6A;
+  --environmental_services: #198038;
+  --facilities_biomed: #007D79;
+  --patient_advocacy: #6929C4;
+  --case_management: #B0389C;
   --nursebar-h: 7.5rem;
 }
 * { box-sizing: border-box; }

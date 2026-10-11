@@ -1,0 +1,183 @@
+/* Staff dashboard: read across a room, act with one press. */
+:root {
+  --paper: #EEF3F5;
+  --card: #FFFFFF;
+  --ink: #10303B;
+  --ink-soft: #46626C;
+  --line: #D3DEE3;
+  --line-strong: #B9C9D0;
+  --emergency: #B3122B;
+  --urgent: #C8102E;
+  --late: #8A4B00;  --late-bg: #FFF1D6;
+  --focus: #F2B705;
+}
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; line-height: 1.35;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- team theme: the whole screen takes the team's colour ---------- */
+.dash {
+  --team: #0F62FE;
+  --team-deep: color-mix(in srgb, var(--team) 70%, #0B1A20);
+  --team-tint: color-mix(in srgb, var(--team) 10%, #F5F7F8);
+  --team-line: color-mix(in srgb, var(--team) 25%, #D3DEE3);
+  min-height: 100vh; background: var(--team-tint); transition: background-color 0.3s ease;
+}
+
+/* ---------- header band in the team colour ---------- */
+.dash-head { background: var(--team-deep); color: #fff; transition: background-color 0.3s ease; }
+.head-row {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem;
+  padding: 1.1rem clamp(1rem, 3vw, 2rem) 1rem;
+}
+.eyebrow {
+  margin: 0; display: flex; align-items: center; gap: 0.9rem; font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.8);
+}
+.dash-head h1 { margin: 0.2rem 0 0.1rem; font-size: clamp(1.8rem, 3.5vw, 2.6rem); line-height: 1.05; }
+.covers { margin: 0; font-size: 0.95rem; color: rgba(255, 255, 255, 0.85); }
+.link { display: inline-flex; align-items: center; gap: 0.35rem; text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+.link::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: currentColor; }
+.link.live { color: #9EF0C2; }
+.link.down { color: #FFC9D0; }
+.link.connecting { color: rgba(255, 255, 255, 0.7); }
+.dash-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1.75rem; margin: 0; }
+.dash-stats div { display: grid; }
+.dash-stats dt { font-size: 0.8rem; color: rgba(255, 255, 255, 0.8); }
+.dash-stats dd { margin: 0; font-size: 1.8rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.dash-stats .global { padding-left: 1.75rem; border-left: 1px solid rgba(255, 255, 255, 0.3); }
+
+/* ---------- team switch, on the band ---------- */
+.team-switch {
+  display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; align-items: flex-end;
+  padding: 0.7rem clamp(1rem, 3vw, 2rem) 0.85rem; background: rgba(0, 0, 0, 0.18);
+  position: sticky; top: 0; z-index: 5;
+}
+.team-group { display: grid; gap: 0.3rem; min-width: 0; }
+.group-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.75); }
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.team-tab {
+  display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;
+  padding: 0.45rem 0.6rem 0.45rem 0.7rem; border-radius: 999px; font-weight: 700;
+  background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35); color: #fff;
+}
+.team-tab:hover { background: rgba(255, 255, 255, 0.22); }
+.swatch { width: 0.8rem; height: 0.8rem; border-radius: 50%; background: var(--tab); box-shadow: 0 0 0 2px #fff; flex: none; }
+.team-tab[aria-selected="true"] { background: #fff; color: var(--ink); border-color: #fff; }
+.team-count {
+  position: relative; min-width: 1.6rem; text-align: center; padding: 0.05rem 0.4rem; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22); font-variant-numeric: tabular-nums; font-size: 0.85rem;
+}
+.team-tab[aria-selected="true"] .team-count { background: var(--tab); color: #fff; }
+.urgent-dot {
+  position: absolute; top: -0.25rem; right: -0.25rem; width: 0.7rem; height: 0.7rem; border-radius: 50%;
+  background: #FF3B55; border: 2px solid #fff;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- queue ---------- */
+.dash-main { padding: 1.25rem clamp(1rem, 3vw, 2rem) 3rem; }
+.queue { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr)); gap: 0.85rem; }
+.none {
+  color: var(--team-deep); font-size: 1.2rem; font-weight: 700; margin: 2rem 0; padding: 2rem; text-align: center;
+  border: 2px dashed var(--team-line); border-radius: 14px; background: rgba(255, 255, 255, 0.5);
+}
+.load-error {
+  display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 1rem;
+  background: #FDE8EB; color: var(--emergency); padding: 0.6rem 0.9rem; border-radius: 10px; font-weight: 700;
+}
+.load-error button { border: 1px solid currentColor; background: #fff; border-radius: 8px; padding: 0.3rem 0.8rem; cursor: pointer; }
+
+/* ---------- ticket: one size, one layout for every team ---------- */
+.queue { grid-auto-rows: 17.5rem; align-items: stretch; }
+.queue > div { min-height: 0; }
+.ticket {
+  height: 100%; display: flex; flex-direction: column; gap: 0.5rem; overflow: hidden;
+  background: var(--card); border: 1px solid var(--team-line); border-left: 8px solid var(--team);
+  border-radius: 12px; padding: 0.85rem 1rem; box-shadow: 0 1px 2px rgba(16, 48, 59, 0.06);
+}
+.ticket.level-1 { background: var(--emergency); border-color: var(--emergency); border-left-color: var(--team); color: #fff; }
+.ticket.level-2 { border: 3px solid var(--urgent); border-left: 8px solid var(--team); }
+.ticket.acknowledged { opacity: 0.75; }
+.ticket.overdue:not(.level-1) { box-shadow: 0 0 0 3px var(--late-bg), 0 0 0 5px var(--late); }
+
+/* room | priority | time */
+.ticket-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 0.5rem; }
+.room { font-size: 1.9rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.room small { display: block; font-size: 0.75rem; font-weight: 400; margin-bottom: 0.15rem; opacity: 0.8; }
+.level-badge {
+  justify-self: center; align-self: center; white-space: nowrap;
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.2rem 0.6rem; border-radius: 6px; border: 2px solid transparent;
+}
+.level-badge.l1 { background: #fff; color: var(--emergency); }
+.level-badge.l2 { background: var(--urgent); color: #fff; }
+.level-badge.l3, .level-badge.l4 { background: #EEF2F4; color: var(--ink-soft); border-color: var(--line); }
+.waited {
+  justify-self: end; display: grid; justify-items: end; gap: 0.15rem; text-align: right;
+  font-size: 0.9rem; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.late-label {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--late); background: var(--late-bg); padding: 0.05rem 0.4rem; border-radius: 6px;
+}
+.waited.late { font-weight: 700; color: var(--late); }
+.level-1 .waited.late { color: #fff; }
+.level-1 .late-label { color: var(--emergency); background: #fff; }
+
+/* request text: fixed space, cut to fit */
+.ticket-body { flex: 1; min-height: 0; overflow: hidden; display: grid; align-content: start; gap: 0.3rem; }
+.ticket-body p, .notes { margin: 0; }
+.clamp-1, .clamp-2 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.clamp-1 { -webkit-line-clamp: 1; }
+.clamp-2 { -webkit-line-clamp: 2; }
+.team-tag {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--team);
+}
+.level-1 .team-tag { color: #fff; opacity: 0.9; }
+.patient-name { font-weight: 700; }
+.summary { font-size: 1.15rem; font-weight: 700; line-height: 1.25; }
+.said, .why { font-size: 0.88rem; color: var(--ink-soft); }
+.level-1 .said, .level-1 .why { color: #FFE3E7; }
+.notes { padding: 0; list-style: none; display: grid; gap: 0.25rem; }
+.notes li { font-size: 0.85rem; font-weight: 700; background: #FFF1D6; color: #6B4300; padding: 0.2rem 0.5rem; border-radius: 6px; }
+.notes li.more { background: none; padding: 0; color: var(--ink-soft); font-weight: 400; }
+.level-1 .notes li { background: #fff; color: var(--emergency); }
+.level-1 .notes li.more { background: none; color: #FFE3E7; }
+.away { font-size: 0.88rem; font-weight: 700; color: #1F4E8C; }
+
+/* action: always at the bottom */
+.ticket-actions { display: flex; justify-content: flex-end; align-items: center; gap: 0.6rem; flex: none; }
+.state { font-size: 0.85rem; font-weight: 700; color: var(--ink-soft); }
+.level-1 .state { color: #FFE3E7; }
+.act {
+  font-weight: 700; font-size: 1rem; padding: 0.5rem 1.1rem; border-radius: 8px; cursor: pointer;
+  border: 2px solid var(--ink); background: var(--ink); color: #fff;
+}
+.act.done { background: var(--card); color: var(--ink); }
+.act:disabled { opacity: 0.6; cursor: progress; }
+.level-1 .act { background: #fff; border-color: #fff; color: var(--emergency); }
+.ticket-error { flex: 1; font-size: 0.85rem; font-weight: 700; color: var(--emergency); }
+.level-1 .ticket-error { color: #fff; }
+
+@keyframes arrive { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.arrive .ticket { animation: arrive 0.3s ease-out; outline: 3px solid var(--focus); }
+@media (prefers-reduced-motion: reduce) { .arrive .ticket { animation: none; } }
+
+/* development only: placeholder-backend notice */
+.mock-strip {
+  height: 20px; text-align: center; font: 600 12px/20px system-ui, sans-serif;
+  background: #FFF4D6; color: #6B4E00; border-bottom: 1px solid #B98900;
+}
+
+/* phones: the switch scrolls away instead of covering half the screen */
+@media (max-width: 700px) {
+  .team-switch { position: static; }
+  .dash-stats { gap: 0.5rem 1.25rem; }
+  .dash-stats .global { padding-left: 0; border-left: 0; }
+}
