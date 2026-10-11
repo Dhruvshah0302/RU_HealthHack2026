@@ -1,0 +1,136 @@
+{"id": "hk-01", "slice": "housekeeping", "lang": "en", "text": "Can I get an extra pillow?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-02", "slice": "housekeeping", "lang": "en", "text": "My room is cold and the bathroom floor is sticky.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-03", "slice": "housekeeping", "lang": "en", "text": "Could someone bring me another blanket?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-04", "slice": "housekeeping", "lang": "en", "text": "The trash can is overflowing.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-05", "slice": "housekeeping", "lang": "en", "text": "There's a spill on the floor by the window.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-06", "slice": "housekeeping", "lang": "en", "text": "My sheets need to be changed, I spilled juice on them.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-07", "slice": "housekeeping", "lang": "en", "text": "The light above my bed keeps flickering.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-08", "slice": "housekeeping", "lang": "en", "text": "The toilet won't flush.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-09", "slice": "housekeeping", "lang": "en", "text": "It's too hot in here, can someone turn down the heat?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-10", "slice": "housekeeping", "lang": "en", "text": "The bathroom is out of toilet paper.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-11", "slice": "housekeeping", "lang": "en", "text": "Can I get a clean towel and some soap?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-12", "slice": "housekeeping", "lang": "en", "text": "The window blind is stuck and the sun is in my eyes.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-13", "slice": "housekeeping", "lang": "en", "text": "My room smells bad, can someone clean it?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-14", "slice": "housekeeping", "lang": "en", "text": "The sink is leaking onto the floor.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-15", "slice": "housekeeping", "lang": "en", "text": "Can someone empty the laundry bin?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-16", "slice": "housekeeping", "lang": "en", "text": "The bed won't go up or down when I press the button.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-17", "slice": "housekeeping", "lang": "en", "text": "The air conditioner is making a loud rattling noise.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "hk-18", "slice": "housekeeping", "lang": "en", "text": "The door squeaks really loudly every time it opens.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "fd-01", "slice": "food", "lang": "en", "text": "Can I get some ice water and apple juice?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-02", "slice": "food", "lang": "en", "text": "I'm hungry, when is lunch coming?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-03", "slice": "food", "lang": "en", "text": "My breakfast tray never came.", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-04", "slice": "food", "lang": "en", "text": "Could I get a cup of coffee, please?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-05", "slice": "food", "lang": "en", "text": "They forgot the sugar-free jello on my tray.", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-06", "slice": "food", "lang": "en", "text": "Can I order a vegetarian dinner?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-07", "slice": "food", "lang": "en", "text": "This soup is cold, can it be warmed up?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-08", "slice": "food", "lang": "en", "text": "I'd like some crackers and ginger ale.", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-09", "slice": "food", "lang": "en", "text": "Is there a kosher meal option?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-10", "slice": "food", "lang": "en", "text": "Can someone take away my dinner tray?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-11", "slice": "food", "lang": "en", "text": "I need a straw and an extra spoon.", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-12", "slice": "food", "lang": "en", "text": "Could I get some hot tea with lemon?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-13", "slice": "food", "lang": "en", "text": "I didn't get the menu for tomorrow.", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-14", "slice": "food", "lang": "en", "text": "Can I have a snack before bed?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "fd-15", "slice": "food", "lang": "en", "text": "My wife wants to buy a guest meal, how do we do that?", "expected": [{"department": "food_services", "priority": "routine"}]}
+{"id": "uc-01", "slice": "unit_clerk", "lang": "en", "text": "The television remote isn't changing channels.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-02", "slice": "unit_clerk", "lang": "en", "text": "The Wi-Fi isn't working on my phone.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-03", "slice": "unit_clerk", "lang": "en", "text": "How do I turn on subtitles on the TV?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-04", "slice": "unit_clerk", "lang": "en", "text": "Can I borrow a phone charger?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-05", "slice": "unit_clerk", "lang": "en", "text": "The bedside phone has no dial tone.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-06", "slice": "unit_clerk", "lang": "en", "text": "What are the visiting hours?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-07", "slice": "unit_clerk", "lang": "en", "text": "Can my daughter get a parking pass?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-08", "slice": "unit_clerk", "lang": "en", "text": "The TV has no sound.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-09", "slice": "unit_clerk", "lang": "en", "text": "How do I call an outside number from this phone?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-10", "slice": "unit_clerk", "lang": "en", "text": "The tablet at my bed is frozen.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-11", "slice": "unit_clerk", "lang": "en", "text": "I need the Wi-Fi password.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-12", "slice": "unit_clerk", "lang": "en", "text": "Can someone help me set up a video call with my family?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-13", "slice": "unit_clerk", "lang": "en", "text": "The TV keeps turning itself off.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-14", "slice": "unit_clerk", "lang": "en", "text": "Is there a chaplain I can speak with?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "uc-15", "slice": "unit_clerk", "lang": "en", "text": "Where can my family get coffee downstairs?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "ud-01", "slice": "urgent_direct", "lang": "en", "text": "My surgical incision is throbbing and I feel dizzy.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-02", "slice": "urgent_direct", "lang": "en", "text": "I'm having chest pain.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-03", "slice": "urgent_direct", "lang": "en", "text": "I can't breathe.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-04", "slice": "urgent_direct", "lang": "en", "text": "I fell on the way to the bathroom.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-05", "slice": "urgent_direct", "lang": "en", "text": "There's blood coming through my bandage.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-06", "slice": "urgent_direct", "lang": "en", "text": "I'm going to throw up and my stomach pain is really bad.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-07", "slice": "urgent_direct", "lang": "en", "text": "My IV site is swollen and it burns.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-08", "slice": "urgent_direct", "lang": "en", "text": "I feel like I'm going to pass out.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-09", "slice": "urgent_direct", "lang": "en", "text": "My pain is a 9 out of 10.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-10", "slice": "urgent_direct", "lang": "en", "text": "I think I'm having an allergic reaction, my lips are swelling.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-11", "slice": "urgent_direct", "lang": "en", "text": "I'm having trouble breathing and my oxygen tube fell off.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-12", "slice": "urgent_direct", "lang": "en", "text": "My heart is racing and I feel shaky.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-13", "slice": "urgent_direct", "lang": "en", "text": "I have a terrible headache and my vision is blurry.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-14", "slice": "urgent_direct", "lang": "en", "text": "I'm bleeding from where they put the catheter in.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ud-15", "slice": "urgent_direct", "lang": "en", "text": "I need help right now, something is wrong.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-01", "slice": "urgent_indirect", "lang": "en", "text": "It feels like an elephant is sitting on my chest.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-02", "slice": "urgent_indirect", "lang": "en", "text": "I can't seem to catch my breath.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-03", "slice": "urgent_indirect", "lang": "en", "text": "The cut from my operation is hot and there's yellow stuff leaking out.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible wound infection"}
+{"id": "ui-04", "slice": "urgent_indirect", "lang": "en", "text": "The room is spinning.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-05", "slice": "urgent_indirect", "lang": "en", "text": "My left arm feels funny and heavy all of a sudden.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-06", "slice": "urgent_indirect", "lang": "en", "text": "My husband isn't making sense, he doesn't know where he is.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "family member speaking"}
+{"id": "ui-07", "slice": "urgent_indirect", "lang": "en", "text": "My legs won't hold me up, I slid down to the floor.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-08", "slice": "urgent_indirect", "lang": "en", "text": "One side of my face feels droopy.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-09", "slice": "urgent_indirect", "lang": "en", "text": "I keep seeing spots and I feel really weird.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-10", "slice": "urgent_indirect", "lang": "en", "text": "My tongue feels thick and my throat is itchy since the new medicine.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible drug reaction"}
+{"id": "ui-11", "slice": "urgent_indirect", "lang": "en", "text": "There's something wet and red on my sheets.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-12", "slice": "urgent_indirect", "lang": "en", "text": "The machine next to me keeps beeping and the bag is empty.", "expected": [{"department": "nurse", "priority": "urgent"}], "review": true, "note": "IV pump alarm: nurse, but is it urgent?"}
+{"id": "ui-13", "slice": "urgent_indirect", "lang": "en", "text": "I haven't been able to pee all day and my belly really hurts.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-14", "slice": "urgent_indirect", "lang": "en", "text": "I don't see the point of going on anymore.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible self-harm risk"}
+{"id": "ui-15", "slice": "urgent_indirect", "lang": "en", "text": "My calf is swollen, red and sore.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible clot"}
+{"id": "ui-16", "slice": "urgent_indirect", "lang": "en", "text": "I can't keep my eyes open since they gave me that shot.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible over-sedation"}
+{"id": "ui-17", "slice": "urgent_indirect", "lang": "en", "text": "My stitches came open.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-18", "slice": "urgent_indirect", "lang": "en", "text": "Everything looks blurry and my words are coming out wrong.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "ui-19", "slice": "urgent_indirect", "lang": "en", "text": "My baby isn't moving like before.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "maternity unit"}
+{"id": "ui-20", "slice": "urgent_indirect", "lang": "en", "text": "I'm sweating a lot and feel clammy, and I'm diabetic.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "possible low blood sugar"}
+{"id": "ui-21", "slice": "urgent_indirect", "lang": "en", "text": "I think I'm dying.", "expected": [{"department": "nurse", "priority": "urgent"}]}
+{"id": "nr-01", "slice": "nurse_routine", "lang": "en", "text": "When is my next pain medication due?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-02", "slice": "nurse_routine", "lang": "en", "text": "Can I talk to my doctor about my test results?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-03", "slice": "nurse_routine", "lang": "en", "text": "I need help getting to the bathroom.", "expected": [{"department": "nurse", "priority": "routine"}], "review": true, "note": "fall risk: should this be urgent?"}
+{"id": "nr-04", "slice": "nurse_routine", "lang": "en", "text": "Can someone help me turn over in bed?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-05", "slice": "nurse_routine", "lang": "en", "text": "Is it okay for me to take a shower?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-06", "slice": "nurse_routine", "lang": "en", "text": "I have a question about my new pills.", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-07", "slice": "nurse_routine", "lang": "en", "text": "When am I going home?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-08", "slice": "nurse_routine", "lang": "en", "text": "Can I have something to help me sleep?", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "nr-09", "slice": "nurse_routine", "lang": "en", "text": "Am I allowed to eat before my procedure tomorrow?", "expected": [{"department": "nurse", "priority": "routine"}], "note": "a diet question is clinical, not a food order"}
+{"id": "nr-10", "slice": "nurse_routine", "lang": "en", "text": "My bandage is coming loose, can someone re-tape it?", "expected": [{"department": "nurse", "priority": "routine"}], "review": true}
+{"id": "nr-11", "slice": "nurse_routine", "lang": "en", "text": "Can I get my blood sugar checked?", "expected": [{"department": "nurse", "priority": "routine"}], "review": true}
+{"id": "nr-12", "slice": "nurse_routine", "lang": "en", "text": "I'd like an ice pack for my knee.", "expected": [{"department": "nurse", "priority": "routine"}]}
+{"id": "mx-01", "slice": "mixed", "lang": "en", "text": "Can I get some water, and also my chest feels tight.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "food_services", "priority": "routine"}]}
+{"id": "mx-02", "slice": "mixed", "lang": "en", "text": "The TV is broken and I need a blanket.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}, {"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "mx-03", "slice": "mixed", "lang": "en", "text": "My room is cold and my incision is bleeding.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "mx-04", "slice": "mixed", "lang": "en", "text": "Can you bring juice and tell me when my next medicine is?", "expected": [{"department": "nurse", "priority": "routine"}, {"department": "food_services", "priority": "routine"}]}
+{"id": "mx-05", "slice": "mixed", "lang": "en", "text": "The floor is wet and I almost slipped.", "expected": [{"department": "nurse", "priority": "routine"}, {"department": "housekeeping_facilities", "priority": "routine"}], "review": true}
+{"id": "mx-06", "slice": "mixed", "lang": "en", "text": "I spilled my water and now I feel dizzy.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "mx-07", "slice": "mixed", "lang": "en", "text": "Wi-Fi is down, and can I get another pillow and some tea?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}, {"department": "housekeeping_facilities", "priority": "routine"}, {"department": "food_services", "priority": "routine"}]}
+{"id": "mx-08", "slice": "mixed", "lang": "en", "text": "I need the bathroom cleaned, and I've been throwing up all morning.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "housekeeping_facilities", "priority": "routine"}], "review": true}
+{"id": "mx-09", "slice": "mixed", "lang": "en", "text": "Lunch was cold and the light in the bathroom is out.", "expected": [{"department": "food_services", "priority": "routine"}, {"department": "housekeeping_facilities", "priority": "routine"}]}
+{"id": "mx-10", "slice": "mixed", "lang": "en", "text": "Can someone fix the TV? Also the IV in my arm really hurts.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "mx-11", "slice": "mixed", "lang": "en", "text": "I want to order dinner, and what time can my son visit?", "expected": [{"department": "food_services", "priority": "routine"}, {"department": "unit_clerk_it", "priority": "routine"}]}
+{"id": "mx-12", "slice": "mixed", "lang": "en", "text": "My sheets are soaked with sweat and I feel feverish.", "expected": [{"department": "nurse", "priority": "urgent"}, {"department": "housekeeping_facilities", "priority": "routine"}], "review": true}
+{"id": "fg-01", "slice": "figurative", "lang": "en", "text": "I'm dying for a coffee.", "expected": [{"department": "food_services", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-02", "slice": "figurative", "lang": "en", "text": "This TV show is killing me, can you change the channel? The remote doesn't work.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-03", "slice": "figurative", "lang": "en", "text": "I'm sick of jello, can I get something else to eat?", "expected": [{"department": "food_services", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-04", "slice": "figurative", "lang": "en", "text": "My phone is dead, do you have a charger?", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-05", "slice": "figurative", "lang": "en", "text": "It's so cold in here I could die.", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-06", "slice": "figurative", "lang": "en", "text": "The remote is a real pain to use.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-07", "slice": "figurative", "lang": "en", "text": "My heart sank when I saw the Wi-Fi is down again.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "fg-08", "slice": "figurative", "lang": "en", "text": "I'd kill for a decent cup of tea.", "expected": [{"department": "food_services", "priority": "routine"}], "note": "figure of speech, not a symptom"}
+{"id": "ml-01", "slice": "multilingual", "lang": "es", "text": "¿Me pueden traer otra almohada, por favor?", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}], "note": "another pillow"}
+{"id": "ml-02", "slice": "multilingual", "lang": "es", "text": "Tengo mucho dolor en el pecho.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "chest pain"}
+{"id": "ml-03", "slice": "multilingual", "lang": "es", "text": "No puedo respirar bien.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "can't breathe well"}
+{"id": "ml-04", "slice": "multilingual", "lang": "es", "text": "El control de la televisión no funciona.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "TV remote broken"}
+{"id": "ml-05", "slice": "multilingual", "lang": "es", "text": "Quisiera un vaso de agua con hielo.", "expected": [{"department": "food_services", "priority": "routine"}], "note": "glass of ice water"}
+{"id": "ml-06", "slice": "multilingual", "lang": "es", "text": "Siento que me voy a desmayar.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "about to faint"}
+{"id": "ml-07", "slice": "multilingual", "lang": "es", "text": "¿Cuándo me toca la próxima medicina?", "expected": [{"department": "nurse", "priority": "routine"}], "note": "next medicine"}
+{"id": "ml-08", "slice": "multilingual", "lang": "hi", "text": "मुझे एक और कंबल चाहिए।", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}], "note": "another blanket"}
+{"id": "ml-09", "slice": "multilingual", "lang": "hi", "text": "मेरे सीने में बहुत दर्द हो रहा है।", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "severe chest pain"}
+{"id": "ml-10", "slice": "multilingual", "lang": "hi", "text": "टीवी का रिमोट काम नहीं कर रहा है।", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "TV remote broken"}
+{"id": "ml-11", "slice": "multilingual", "lang": "hi", "text": "मुझे चक्कर आ रहा है और उल्टी जैसा लग रहा है।", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "dizzy and nauseous"}
+{"id": "ml-12", "slice": "multilingual", "lang": "hi", "text": "Mujhe bahut chakkar aa raha hai.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "romanized Hindi: very dizzy"}
+{"id": "ml-13", "slice": "multilingual", "lang": "hi", "text": "Paani milega please?", "expected": [{"department": "food_services", "priority": "routine"}], "note": "romanized Hindi: water please"}
+{"id": "ml-14", "slice": "multilingual", "lang": "zh", "text": "可以给我一杯热水吗？", "expected": [{"department": "food_services", "priority": "routine"}], "note": "cup of hot water"}
+{"id": "ml-15", "slice": "multilingual", "lang": "zh", "text": "我胸口很痛，喘不过气。", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "chest pain, can't breathe"}
+{"id": "ml-16", "slice": "multilingual", "lang": "zh", "text": "房间太冷了，可以再给我一条毯子吗？", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}], "note": "room cold, another blanket"}
+{"id": "ml-17", "slice": "multilingual", "lang": "ar", "text": "أشعر بألم شديد في صدري.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "severe chest pain"}
+{"id": "ml-18", "slice": "multilingual", "lang": "ar", "text": "هل يمكنني الحصول على وسادة إضافية؟", "expected": [{"department": "housekeeping_facilities", "priority": "routine"}], "note": "extra pillow"}
+{"id": "ml-19", "slice": "multilingual", "lang": "pt", "text": "A televisão não está funcionando.", "expected": [{"department": "unit_clerk_it", "priority": "routine"}], "note": "TV not working"}
+{"id": "ml-20", "slice": "multilingual", "lang": "pt", "text": "Estou com muita falta de ar.", "expected": [{"department": "nurse", "priority": "urgent"}], "note": "very short of breath"}

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Ask for help</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F7F9;
+    --card: #FFFFFF;
+    --ink: #10303B;
+    --ink-soft: #46626C;
+    --line: #C9D6DC;
+    --nurse: #C8102E;
+    --housekeeping_facilities: #1B7F5C;
+    --food_services: #A65F00;
+    --unit_clerk_it: #3A55A8;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 20px; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Atkinson Hyperlegible", "Verdana", "Segoe UI", sans-serif;
+    line-height: 1.4; min-height: 100vh;
+    padding-bottom: 7.5rem; /* room for the fixed nurse bar */
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding: 1rem 1.25rem; max-width: 46rem; margin: 0 auto;
+  }
+  .room { font-size: 1rem; color: var(--ink-soft); }
+  .room b { color: var(--ink); font-size: 1.25rem; }
+  .lang { display: flex; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .lang button {
+    font: inherit; font-size: 0.9rem; padding: 0.45rem 0.9rem; border: 0; background: transparent;
+    color: var(--ink); cursor: pointer;
+  }
+  .lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  main { max-width: 46rem; margin: 0 auto; padding: 0.5rem 1.25rem 1rem; }
+  h1 { font-size: 2.4rem; line-height: 1.1; margin: 0.75rem 0 1rem; letter-spacing: -0.01em; }
+  label.field { display: block; font-size: 1rem; color: var(--ink-soft); margin-bottom: 0.4rem; }
+  textarea {
+    width: 100%; min-height: 6.5rem; resize: vertical; font: inherit; font-size: 1.3rem;
+    padding: 0.9rem 1rem; border: 2px solid var(--ink); border-radius: 14px; background: var(--card);
+    color: var(--ink);
+  }
+  textarea::placeholder { color: #7B929B; }
+  .send {
+    margin-top: 0.8rem; width: 100%; font: inherit; font-weight: 700; font-size: 1.35rem;
+    padding: 1rem; border: 0; border-radius: 14px; background: var(--ink); color: #fff; cursor: pointer;
+  }
+  .send:disabled { opacity: 0.55; cursor: progress; }
+  h2 { font-size: 1.05rem; font-weight: 400; color: var(--ink-soft); margin: 1.6rem 0 0.6rem; }
+  .quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.6rem; }
+  .quick button {
+    font: inherit; font-size: 1.15rem; text-align: left; padding: 0.85rem 1rem; cursor: pointer;
+    background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 14px;
+    border-left: 10px solid var(--stripe, var(--line));
+  }
+  .quick button:hover { border-color: var(--ink); border-left-color: var(--stripe, var(--ink)); }
+  button:focus-visible, textarea:focus-visible { outline: 4px solid #F2B705; outline-offset: 3px; }
+
+  /* confirmation */
+  #done h1 { margin-top: 1.5rem; }
+  .sent { list-style: none; padding: 0; margin: 0 0 1.25rem; display: grid; gap: 0.7rem; }
+  .sent li {
+    background: var(--card); border-radius: 14px; padding: 1rem 1.1rem; font-size: 1.3rem;
+    border-left: 14px solid var(--stripe);
+  }
+  .again {
+    font: inherit; font-size: 1.15rem; padding: 0.85rem 1.2rem; border-radius: 14px; cursor: pointer;
+    background: transparent; color: var(--ink); border: 2px solid var(--ink);
+  }
+  .problem {
+    background: #FFF4D6; border: 2px solid #B98900; border-radius: 14px; padding: 0.9rem 1rem;
+    margin-top: 1rem; font-size: 1.1rem;
+  }
+
+  /* the nurse bar is always on screen and never depends on the sorter */
+  .nursebar {
+    position: fixed; left: 0; right: 0; bottom: 0; background: var(--paper);
+    border-top: 2px solid var(--line); padding: 0.8rem 1.25rem 1rem;
+  }
+  .nursebar button {
+    display: block; width: 100%; max-width: 43.5rem; margin: 0 auto; font: inherit; font-weight: 700;
+    font-size: 1.5rem; padding: 1.05rem; border: 0; border-radius: 14px; background: var(--nurse);
+    color: #fff; cursor: pointer;
+  }
+  .nursebar p { max-width: 43.5rem; margin: 0.45rem auto 0; font-size: 0.85rem; color: var(--ink-soft); text-align: center; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="room"><span data-t="room">Room</span> <b id="room"></b></div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" aria-pressed="true">English</button>
+    <button type="button" data-lang="es" aria-pressed="false">Español</button>
+  </div>
+</header>
+
+<main>
+  <section id="ask">
+    <h1 data-t="title">What do you need?</h1>
+    <form id="form">
+      <label class="field" for="text" data-t="hint">Type it in your own words, in any language.</label>
+      <textarea id="text" maxlength="600" autocomplete="off"></textarea>
+      <button class="send" id="send" type="submit" data-t="send">Send request</button>
+    </form>
+    <p class="problem" id="problem" role="alert" hidden></p>
+
+    <h2 data-t="quickTitle">Or tap one</h2>
+    <div class="quick" id="quick"></div>
+  </section>
+
+  <section id="done" aria-live="polite" hidden>
+    <h1 id="doneTitle"></h1>
+    <ul class="sent" id="sent"></ul>
+    <button class="again" id="again" type="button" data-t="again">Ask for something else</button>
+  </section>
+</main>
+
+<div class="nursebar">
+  <button type="button" id="nurse" data-t="nurse">Call my nurse now</button>
+  <p data-t="nurseHint">Pain, trouble breathing, or anything that feels wrong: press this.</p>
+</div>
+
+<script>
+const T = {
+  en: {
+    room: "Room", title: "What do you need?", hint: "Type it in your own words, in any language.",
+    send: "Send request", sending: "Sending", quickTitle: "Or tap one", again: "Ask for something else",
+    nurse: "Call my nurse now", nurseHint: "Pain, trouble breathing, or anything that feels wrong: press this.",
+    doneTitle: "We got it.", nurseAlerted: "Your nurse has been alerted.",
+    nurseTold: "Your nurse has your message.", has: "has your request.",
+    empty: "Type what you need, or tap one of the choices below.",
+    failed: "That did not go through. Try again, or press Call my nurse now.",
+    dept: { housekeeping_facilities: "Housekeeping", food_services: "Food Services", unit_clerk_it: "The unit clerk" },
+    quick: [
+      ["food_services", "Water", "I would like some water."],
+      ["housekeeping_facilities", "Blanket", "I need another blanket."],
+      ["housekeeping_facilities", "Pillow", "I need an extra pillow."],
+      ["housekeeping_facilities", "Clean my room", "My room needs cleaning."],
+      ["unit_clerk_it", "TV or Wi-Fi help", "I need help with the TV or the Wi-Fi."],
+      ["food_services", "Meal or snack", "I would like something to eat."],
+    ],
+  },
+  es: {
+    room: "Habitación", title: "¿Qué necesita?", hint: "Escríbalo con sus propias palabras, en cualquier idioma.",
+    send: "Enviar", sending: "Enviando", quickTitle: "O toque una opción", again: "Pedir otra cosa",
+    nurse: "Llamar a mi enfermera ahora", nurseHint: "Dolor, dificultad para respirar o algo que no se sienta bien: presione aquí.",
+    doneTitle: "Recibido.", nurseAlerted: "Su enfermera ha sido avisada.",
+    nurseTold: "Su enfermera tiene su mensaje.", has: "tiene su pedido.",
+    empty: "Escriba lo que necesita o toque una de las opciones.",
+    failed: "No se pudo enviar. Intente de nuevo o presione Llamar a mi enfermera ahora.",
+    dept: { housekeeping_facilities: "Limpieza", food_services: "Servicio de comidas", unit_clerk_it: "La recepción de la unidad" },
+    quick: [
+      ["food_services", "Agua", "Quisiera un poco de agua."],
+      ["housekeeping_facilities", "Cobija", "Necesito otra cobija."],
+      ["housekeeping_facilities", "Almohada", "Necesito otra almohada."],
+      ["housekeeping_facilities", "Limpiar mi habitación", "Mi habitación necesita limpieza."],
+      ["unit_clerk_it", "Ayuda con la TV o el Wi-Fi", "Necesito ayuda con la televisión o el Wi-Fi."],
+      ["food_services", "Comida o merienda", "Quisiera algo de comer."],
+    ],
+  },
+};
+
+const $ = (id) => document.getElementById(id);
+const room = new URLSearchParams(location.search).get("room") || "412";
+let lang = "en";
+$("room").textContent = room;
+
+function render() {
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t[el.dataset.t]; });
+  document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+  const quick = $("quick");
+  quick.replaceChildren(...t.quick.map(([dept, label, text]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = label;
+    b.style.setProperty("--stripe", `var(--${dept})`);
+    b.addEventListener("click", () => submit({ text }));
+    return b;
+  }));
+}
+
+function showProblem(message) {
+  $("problem").textContent = message;
+  $("problem").hidden = false;
+}
+
+async function submit({ text = "", direct_nurse = false }) {
+  const t = T[lang];
+  $("problem").hidden = true;
+  if (!direct_nurse && !text.trim()) { showProblem(t.empty); $("text").focus(); return; }
+  $("send").disabled = true; $("send").textContent = t.sending;
+  try {
+    const response = await fetch("/api/requests", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ room, text, direct_nurse }),
+    });
+    if (!response.ok) throw new Error(String(response.status));
+    showDone((await response.json()).tickets);
+  } catch (err) {
+    showProblem(t.failed);
+  } finally {
+    $("send").disabled = false; $("send").textContent = t.send;
+  }
+}
+
+function showDone(tickets) {
+  const t = T[lang];
+  $("doneTitle").textContent = t.doneTitle;
+  $("sent").replaceChildren(...tickets.map((ticket) => {
+    const li = document.createElement("li");
+    li.style.setProperty("--stripe", `var(--${ticket.department})`);
+    if (ticket.department === "nurse") {
+      li.textContent = ticket.priority === "urgent" ? t.nurseAlerted : t.nurseTold;
+    } else {
+      li.textContent = `${t.dept[ticket.department]} ${t.has}`;
+    }
+    return li;
+  }));
+  $("text").value = "";           // so a later nurse press never carries an old request
+  $("ask").hidden = true; $("done").hidden = false;
+  $("again").focus();
+}
+
+$("form").addEventListener("submit", (e) => { e.preventDefault(); submit({ text: $("text").value }); });
+$("nurse").addEventListener("click", () => submit({ text: $("text").value, direct_nurse: true }));
+$("again").addEventListener("click", () => {
+  $("done").hidden = true; $("ask").hidden = false; $("text").focus();
+});
+document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; render(); }));
+render();
+</script>
+</body>
+</html>

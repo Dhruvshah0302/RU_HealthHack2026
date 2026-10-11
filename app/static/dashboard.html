@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Call bell requests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F7F9;
+    --card: #FFFFFF;
+    --ink: #10303B;
+    --ink-soft: #46626C;
+    --line: #C9D6DC;
+    --nurse: #C8102E;
+    --housekeeping_facilities: #1B7F5C;
+    --food_services: #A65F00;
+    --unit_clerk_it: #3A55A8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Atkinson Hyperlegible", "Verdana", "Segoe UI", sans-serif; line-height: 1.35;
+  }
+  header {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 2rem;
+    padding: 1rem 1.25rem; border-bottom: 2px solid var(--line); background: var(--card);
+  }
+  h1 { font-size: 1.35rem; margin: 0; }
+  .stat { font-size: 1rem; color: var(--ink-soft); }
+  .stat b { color: var(--ink); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  #link { margin-left: auto; font-size: 0.9rem; color: var(--ink-soft); }
+  #link.down { color: var(--nurse); font-weight: 700; }
+
+  /* one lane per department, like the coloured lines on a hospital corridor floor */
+  .lanes { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 1rem; padding: 1rem 1.25rem; align-items: start; }
+  .lanes.single { grid-template-columns: minmax(0, 40rem); }
+  .lane { min-width: 0; }
+  .lane h2 {
+    font-size: 1.05rem; margin: 0 0 0.75rem; padding-top: 0.6rem;
+    border-top: 8px solid var(--stripe); display: flex; justify-content: space-between; gap: 0.5rem;
+  }
+  .lane h2 span { color: var(--ink-soft); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .list { display: grid; gap: 0.6rem; }
+  .none { color: var(--ink-soft); font-size: 0.95rem; margin: 0; }
+
+  .ticket {
+    background: var(--card); border-radius: 10px; padding: 0.75rem 0.85rem; border: 1px solid var(--line);
+    border-left: 8px solid var(--stripe); display: grid; gap: 0.3rem;
+  }
+  .ticket.urgent { background: var(--nurse); border-color: var(--nurse); color: #fff; }
+  .ticket.acknowledged { opacity: 0.72; }
+  .top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+  .roomno { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+  .roomno small { font-size: 0.8rem; font-weight: 400; margin-right: 0.3rem; }
+  .age { font-size: 0.9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .flag { font-weight: 700; font-size: 0.95rem; }
+  .summary { font-size: 1.05rem; margin: 0; overflow-wrap: anywhere; }
+  .said, .why { font-size: 0.85rem; margin: 0; color: var(--ink-soft); overflow-wrap: anywhere; }
+  .ticket.urgent .said, .ticket.urgent .why { color: #FFE3E7; }
+  .actions { margin-top: 0.3rem; }
+  .actions button {
+    font: inherit; font-size: 0.95rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--ink); background: var(--card); color: var(--ink);
+  }
+  .ticket.urgent .actions button { border-color: #fff; background: #fff; color: var(--nurse); }
+  button:focus-visible { outline: 3px solid #F2B705; outline-offset: 2px; }
+  @keyframes arrive { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .ticket.new { animation: arrive 0.25s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .ticket.new { animation: none; } }
+  @media (max-width: 900px) { .lanes { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Call bell requests</h1>
+  <div class="stat"><b id="total">0</b> requests so far</div>
+  <div class="stat"><b id="kept">0</b> handled without a nurse</div>
+  <div id="link" role="status">Connecting</div>
+</header>
+<div class="lanes" id="lanes"></div>
+
+<script>
+const LANES = [
+  ["nurse", "Nurse"],
+  ["housekeeping_facilities", "Housekeeping & Facilities"],
+  ["food_services", "Food Services"],
+  ["unit_clerk_it", "Unit Clerk / IT"],
+];
+const only = new URLSearchParams(location.search).get("dept");   // ?dept=food_services shows one lane
+const tickets = new Map();
+const fresh = new Set();
+const $ = (id) => document.getElementById(id);
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function age(createdAt) {
+  const seconds = Math.max(0, Math.floor(Date.now() / 1000 - createdAt));
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+}
+
+function card(ticket) {
+  const urgent = ticket.priority === "urgent";
+  const node = el("article", `ticket ${urgent ? "urgent" : ""} ${ticket.status === "acknowledged" ? "acknowledged" : ""} ${fresh.has(ticket.id) ? "new" : ""}`);
+  node.style.setProperty("--stripe", `var(--${ticket.department})`);
+  const top = el("div", "top");
+  const roomno = el("div", "roomno");
+  roomno.append(el("small", "", "Room"), ticket.room);
+  top.append(roomno, el("div", "age", age(ticket.created_at)));
+  node.append(top);
+  if (urgent) node.append(el("div", "flag", "Urgent"));
+  node.append(el("p", "summary", ticket.summary));
+  if (ticket.original_text && ticket.original_text !== ticket.summary) {
+    node.append(el("p", "said", `Patient said: "${ticket.original_text}"`));
+  }
+  if (ticket.department === "nurse" && ticket.reasons.length) {
+    node.append(el("p", "why", `Why this is here: ${ticket.reasons.join("; ")}`));
+  }
+  const actions = el("div", "actions");
+  const next = ticket.status === "open" ? ["acknowledged", "On it"] : ["done", "Done"];
+  const button = el("button", "", next[1]);
+  button.type = "button";
+  button.addEventListener("click", () => setStatus(ticket.id, next[0]));
+  actions.append(button);
+  node.append(actions);
+  return node;
+}
+
+function render() {
+  const lanes = LANES.filter(([key]) => !only || key === only);
+  $("lanes").className = "lanes" + (lanes.length === 1 ? " single" : "");
+  $("lanes").replaceChildren(...lanes.map(([key, name]) => {
+    const mine = [...tickets.values()].filter((t) => t.department === key)
+      .sort((a, b) => (a.priority === "urgent" ? 0 : 1) - (b.priority === "urgent" ? 0 : 1) || a.created_at - b.created_at);
+    const lane = el("section", "lane");
+    lane.style.setProperty("--stripe", `var(--${key})`);
+    const heading = el("h2", "", name);
+    heading.append(el("span", "", String(mine.length)));
+    const list = el("div", "list");
+    if (mine.length) list.append(...mine.map(card)); else list.append(el("p", "none", "Nothing waiting."));
+    lane.append(heading, list);
+    return lane;
+  }));
+  fresh.clear();
+}
+
+function setStats(stats) {
+  if (!stats) return;
+  $("total").textContent = stats.requests_total;
+  $("kept").textContent = stats.requests_without_nurse;
+}
+
+function apply(ticket, isNew) {
+  if (ticket.status === "done") tickets.delete(ticket.id);
+  else { tickets.set(ticket.id, ticket); if (isNew) fresh.add(ticket.id); }
+}
+
+async function setStatus(id, status) {
+  const response = await fetch(`/api/tickets/${id}/status`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }),
+  });
+  if (response.ok) { apply(await response.json(), false); render(); }
+}
+
+async function load() {
+  const data = await (await fetch("/api/tickets")).json();
+  tickets.clear();
+  data.tickets.forEach((t) => tickets.set(t.id, t));
+  setStats(data.stats);
+  render();
+}
+
+function connect() {
+  const socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
+  socket.onopen = () => { $("link").textContent = "Live"; $("link").className = ""; load(); };
+  socket.onmessage = (message) => {
+    const event = JSON.parse(message.data);
+    apply(event.ticket, event.type === "ticket_created");
+    setStats(event.stats);
+    render();
+  };
+  socket.onclose = () => {
+    $("link").textContent = "Connection lost. Reconnecting."; $("link").className = "down";
+    setTimeout(connect, 2000);
+  };
+}
+
+connect();
+setInterval(render, 20000);   // keep the waiting times current
+</script>
+</body>
+</html>
