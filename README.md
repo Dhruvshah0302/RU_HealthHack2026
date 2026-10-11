@@ -106,7 +106,8 @@ app/
   baseline.py    keyword classifier for offline mode and as the eval floor
   models.py      departments, categories, ticket
   store.py       in-memory ticket store
-  static/        patient.html, dashboard.html
+  voice.py       ElevenLabs proxy: /api/transcribe, /api/speak
+frontend/        patient.html, dashboard.html (plain HTML, CSS and JS, served by app/main.py)
 eval/
   requests.jsonl            136 labeled requests
   run_eval.py               scoring script

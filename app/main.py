@@ -18,7 +18,7 @@ from .voice import router as voice_router
 
 load_dotenv()
 logger = logging.getLogger("callbell")
-STATIC = Path(__file__).parent / "static"
+FRONTEND = Path(__file__).resolve().parent.parent / "frontend"   # RUHack/frontend
 
 app = FastAPI(title="Call Bell Router")
 app.include_router(voice_router)      # ElevenLabs proxy: /api/transcribe, /api/speak
@@ -63,12 +63,12 @@ def home():
 
 @app.get("/patient")
 def patient_page():
-    return FileResponse(STATIC / "patient.html")
+    return FileResponse(FRONTEND / "patient.html")
 
 
 @app.get("/dashboard")
 def dashboard_page():
-    return FileResponse(STATIC / "dashboard.html")
+    return FileResponse(FRONTEND / "dashboard.html")
 
 
 @app.get("/api/health")

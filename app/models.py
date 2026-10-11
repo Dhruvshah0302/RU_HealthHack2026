@@ -58,8 +58,10 @@ class Ticket:
     summary: str
     original_text: str
     created_at: float
-    status: str = "open"          # open -> acknowledged -> done
+    status: str = "open"          # open or waiting_for_patient -> acknowledged -> done
     reasons: list[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)   # patient facts this team needs
+    patient_name: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -67,4 +69,5 @@ class Ticket:
             "department_name": DEPARTMENTS[self.department], "priority": self.priority,
             "summary": self.summary, "original_text": self.original_text,
             "created_at": self.created_at, "status": self.status, "reasons": self.reasons,
+            "notes": self.notes, "patient_name": self.patient_name,
         }

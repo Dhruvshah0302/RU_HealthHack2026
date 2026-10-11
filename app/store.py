@@ -14,11 +14,12 @@ class TicketStore:
         self.requests_total = 0
         self.requests_without_nurse = 0
 
-    def add(self, room: str, original_text: str, planned) -> Ticket:
+    def add(self, room: str, original_text: str, planned, patient_name: str | None = None) -> Ticket:
         ticket = Ticket(
             id=f"T{next(self._ids):04d}", room=room, department=planned.department,
             priority=planned.priority, summary=planned.summary, original_text=original_text,
-            created_at=time.time(), reasons=list(planned.reasons),
+            created_at=time.time(), status=planned.status, reasons=list(planned.reasons),
+            notes=list(planned.notes), patient_name=patient_name,
         )
         self._tickets[ticket.id] = ticket
         return ticket

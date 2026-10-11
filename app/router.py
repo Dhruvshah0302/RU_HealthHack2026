@@ -27,6 +27,8 @@ class PlannedTicket:
     priority: str
     summary: str
     reasons: list[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)   # patient facts this team needs (app/policy.py)
+    status: str = "open"                             # "waiting_for_patient" when the patient is off the unit
 
 
 @dataclass
@@ -66,7 +68,11 @@ def route(text: str, classifier, direct_nurse: bool = False) -> Decision:
         fail_safe = f"low confidence ({result.confidence:.2f})"
 
     if fail_safe:
-        intents = [Intent(category="unknown", summary="Could not sort this request. Please check on the patient.")]
+        # The fallback can raise a request but never lower it. A model that was unsure
+        # but still called something urgent leaves the nurse ticket urgent.
+        was_urgent = result is not None and any(i.priority == URGENT for i in result.intents)
+        intents = [Intent(category="unknown", priority=URGENT if was_urgent else ROUTINE,
+                          summary="Could not sort this request. Please check on the patient.")]
     else:
         intents = result.intents
 
