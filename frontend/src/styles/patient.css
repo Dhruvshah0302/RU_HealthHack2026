@@ -1,0 +1,198 @@
+/* Bedside patient page. Large type, high contrast, one action at a time. */
+:root {
+  --paper: #F3F7F9;
+  --card: #FFFFFF;
+  --ink: #10303B;
+  --ink-soft: #46626C;
+  --line: #C9D6DC;
+  --nurse: #C8102E;
+  --voice: #D7192F;
+  --housekeeping_facilities: #1B7F5C;
+  --food_services: #A65F00;
+  --unit_clerk_it: #3A55A8;
+  --nursebar-h: 7.5rem;
+}
+* { box-sizing: border-box; }
+html { font-size: 20px; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Atkinson Hyperlegible", "Verdana", "Segoe UI", sans-serif;
+  line-height: 1.4; min-height: 100vh; overflow-x: hidden;
+  display: flex; flex-direction: column;
+  padding-bottom: var(--nursebar-h); /* room for the fixed nurse bar */
+}
+#root { flex: 1; display: flex; flex-direction: column; }
+.ask { flex: 1; display: flex; flex-direction: column; }
+
+/* ---------- top: room on the left, Voice / Type switch in the centre ---------- */
+header {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.75rem;
+  padding: 1rem 1.25rem 0.5rem; width: 100%; max-width: 46rem; margin: 0 auto;
+}
+.room { font-size: 0.9rem; color: var(--ink-soft); white-space: nowrap; }
+.room b { color: var(--ink); font-size: 1.15rem; }
+
+.switch {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  background: #E2EAEE; border-radius: 999px; padding: 0.3rem;
+  box-shadow: inset 0 1px 3px rgba(16, 48, 59, 0.15);
+}
+.switch .thumb {
+  position: absolute; top: 0.3rem; bottom: 0.3rem; left: 0.3rem; width: calc(50% - 0.3rem);
+  background: var(--ink); border-radius: 999px; transition: transform 0.25s ease;
+}
+.switch[data-mode="type"] .thumb { transform: translateX(100%); }
+.switch button {
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+  font: inherit; font-weight: 700; font-size: 1.1rem; min-width: 7.2rem; padding: 0.7rem 1.1rem;
+  border: 0; border-radius: 999px; background: transparent; color: var(--ink); cursor: pointer;
+  transition: color 0.25s ease;
+}
+.switch button[aria-selected="true"] { color: #fff; }
+.switch svg { width: 1.2rem; height: 1.2rem; flex: none; }
+@media (prefers-reduced-motion: reduce) { .switch .thumb { transition: none; } }
+
+main { flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 46rem; margin: 0 auto; padding: 0 1.25rem; }
+h1 { font-size: clamp(1.6rem, 4.5vh, 2.2rem); line-height: 1.1; margin: 0.8rem 0 0.4rem; letter-spacing: -0.01em; text-align: center; }
+
+/* ---------- Voice view ---------- */
+.voice-panel { flex: 1; display: flex; flex-direction: column; }
+.stage {
+  --mic: clamp(9rem, min(60vw, 30vh), 16rem);
+  --level: 0;                      /* 0..1 live loudness, set by MicButton */
+  flex: 1; min-height: 0; display: grid; place-items: center; align-content: center;
+  gap: calc(var(--mic) * 0.3 + 0.4rem);
+  overflow: visible;
+}
+.mic-wrap { position: relative; width: var(--mic); height: var(--mic); }
+/* a glow that follows the voice directly, so loudness shows even with animations turned off */
+.halo {
+  position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(215, 25, 47, 0.30) 55%, rgba(215, 25, 47, 0) 72%);
+  transform: scale(1); opacity: 0; transition: transform 0.08s linear, opacity 0.2s ease;
+}
+.listening .halo { opacity: 1; transform: scale(calc(1 + var(--level) * 0.5)); }
+.waves { position: absolute; inset: 0; pointer-events: none; }
+.wave {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 0.35rem solid var(--voice); background: rgba(215, 25, 47, 0.10);
+  opacity: 0; animation: wave 1.3s cubic-bezier(0.15, 0.6, 0.3, 1) forwards;
+}
+/* --peak (how far it travels) and --alpha (how strong it starts) come from the live loudness */
+@keyframes wave {
+  0%   { transform: scale(1);             opacity: var(--alpha, 0.5); }
+  100% { transform: scale(var(--peak, 1.6)); opacity: 0; }
+}
+.guide {
+  position: absolute; inset: 0; border-radius: 50%; border: 2px dashed rgba(16, 48, 59, 0.22);
+  transform: scale(1.4); opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+}
+.listening .guide { opacity: 1; }
+
+.mic {
+  position: relative; z-index: 1;
+  width: 100%; height: 100%; border-radius: 50%; border: 0; cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, #F0404F, var(--voice) 60%, #A80E22);
+  color: #fff; display: grid; place-items: center;
+  box-shadow: 0 10px 28px rgba(200, 16, 46, 0.35), inset 0 -6px 14px rgba(0, 0, 0, 0.18);
+  transition: transform 0.08s linear;
+}
+.mic svg { width: 38%; height: 38%; }
+.mic:active { transform: scale(0.97); }
+.mic:disabled { cursor: progress; opacity: 0.8; }
+.mic:focus-visible { outline: 5px solid #F2B705; outline-offset: 6px; }
+.listening .mic { transform: scale(calc(1 + var(--level) * 0.12)); }
+.working .mic { animation: breathe 1.1s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(0.94); } }
+@media (prefers-reduced-motion: reduce) {
+  .wave { display: none; }           /* ripples off; the glow still follows the voice */
+  .working .mic { animation: none; }
+}
+
+.voice-text { display: grid; gap: 0.3rem; text-align: center; position: relative; z-index: 2; }
+.voice-label { font-size: 1.5rem; font-weight: 700; margin: 0; min-height: 2.1rem; }
+.voice-sub { font-size: 1.05rem; color: var(--ink-soft); margin: 0; min-height: 1.5rem; }
+.voice-sub.quiet { color: #8A5A00; font-weight: 700; }
+.voice-sub.good { color: #1B7F5C; font-weight: 700; }
+
+/* ---------- Type view ---------- */
+.type-panel { padding-bottom: 1rem; }
+label.field { display: block; font-size: 1rem; color: var(--ink-soft); margin: 0.75rem 0 0.4rem; }
+textarea {
+  width: 100%; min-height: 6.5rem; resize: vertical; font: inherit; font-size: 1.3rem;
+  padding: 0.9rem 1rem; border: 2px solid var(--ink); border-radius: 14px; background: var(--card);
+  color: var(--ink);
+}
+.send {
+  margin-top: 0.8rem; width: 100%; font: inherit; font-weight: 700; font-size: 1.35rem;
+  padding: 1rem; border: 0; border-radius: 14px; background: var(--ink); color: #fff; cursor: pointer;
+}
+.send:disabled { opacity: 0.55; cursor: progress; }
+h2 { font-size: 1.05rem; font-weight: 400; color: var(--ink-soft); margin: 1.6rem 0 0.6rem; }
+.quick { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.6rem; }
+.quick button {
+  font: inherit; font-size: 1.15rem; text-align: left; padding: 0.85rem 1rem; cursor: pointer;
+  background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 14px;
+  border-left: 10px solid var(--stripe, var(--line));
+}
+.quick button:hover { border-color: var(--ink); border-left-color: var(--stripe, var(--ink)); }
+.quick button:disabled { opacity: 0.55; cursor: progress; }
+button:focus-visible, textarea:focus-visible { outline: 4px solid #F2B705; outline-offset: 3px; }
+
+.problem {
+  background: #FFF4D6; border: 2px solid #B98900; border-radius: 14px; padding: 0.9rem 1rem;
+  margin: 1rem 0 0; font-size: 1.1rem;
+}
+
+/* ---------- confirmation ---------- */
+.done h1 { margin-top: 1.5rem; text-align: left; }
+.sent { list-style: none; padding: 0; margin: 0 0 1.25rem; display: grid; gap: 0.7rem; }
+.sent li {
+  background: var(--card); border-radius: 14px; padding: 1rem 1.1rem; font-size: 1.3rem;
+  border-left: 14px solid var(--stripe);
+}
+.again {
+  font: inherit; font-size: 1.15rem; padding: 0.85rem 1.2rem; border-radius: 14px; cursor: pointer;
+  background: transparent; color: var(--ink); border: 2px solid var(--ink);
+}
+
+/* the nurse bar is on screen in both modes and never depends on the sorter */
+.nursebar {
+  position: fixed; left: 0; right: 0; bottom: 0; background: var(--paper);
+  border-top: 2px solid var(--line); padding: 0.8rem 1.25rem 1rem; z-index: 5;
+}
+.nursebar button {
+  display: block; width: 100%; max-width: 43.5rem; margin: 0 auto; font: inherit; font-weight: 700;
+  font-size: 1.5rem; padding: 1.05rem; border: 0; border-radius: 14px; background: var(--nurse);
+  color: #fff; cursor: pointer;
+}
+.nursebar p { max-width: 43.5rem; margin: 0.45rem auto 0; font-size: 0.85rem; color: var(--ink-soft); text-align: center; }
+[hidden] { display: none !important; }
+
+/* development only: placeholder-backend notice and the ?debug=1 microphone readout */
+.mock-strip {
+  height: 20px; text-align: center; font: 600 12px/20px system-ui, sans-serif;
+  background: #FFF4D6; color: #6B4E00; border-bottom: 1px solid #B98900;
+}
+.debug {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9; margin: 0; padding: 4px 8px;
+  font: 12px monospace; background: rgba(0, 0, 0, 0.8); color: #0f0;
+}
+
+@media (max-width: 480px) {
+  header { grid-template-columns: 1fr; justify-items: center; gap: 0.4rem; }
+  .switch button { min-width: 6.5rem; padding: 0.65rem 0.9rem; }
+}
+/* short screens (small phones): tighter top and a slimmer nurse bar, same button */
+@media (max-height: 720px) {
+  :root { --nursebar-h: 5.6rem; }
+  header { padding-top: 0.6rem; gap: 0.3rem; }
+  .room { font-size: 0.8rem; }
+  .switch button { padding: 0.5rem 0.8rem; font-size: 1rem; }
+  h1 { margin: 0.4rem 0 0.2rem; }
+  .voice-label { font-size: 1.3rem; min-height: 1.8rem; }
+  .nursebar { padding: 0.6rem 1rem 0.6rem; }
+  .nursebar button { font-size: 1.3rem; padding: 0.85rem; }
+  .nursebar p { font-size: 0.75rem; margin-top: 0.3rem; }
+  .stage { --mic: clamp(8.5rem, min(56vw, 28vh), 16rem); }
+}
